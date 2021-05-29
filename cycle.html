@@ -1,0 +1,723 @@
+<div class="row-fluid">
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Настройки</h2>
+    </div>
+
+    <div class="box-content">
+      <form class="form-horizontal" style="margin: 0;">
+
+        <div class="control-group">
+          <div class="head_settings">Цикличный постинг</div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>Получатели</span></label>
+          <div class="controls">
+             <select id='receivers_type'>
+              <option value='manual'>Указать самостоятельно</option>
+              <option value='auto'>Все группы, в которых бот</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group channel_iter channel_1">
+          <label class='settings-label'><span>Получатель</span></label>
+          <div class="controls">
+             <input id='to_group' class='target' type="text" placeholder="@username" /> <i class="icon-plus-sign add_chan"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Постить с задержкой</span></label>
+          <div class="controls">
+             <input save='yes' id="add_sleep" value="60" type="number" min="0" step="1">  минут</i> </span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Задержка (вход в группы)</span></label>
+          <div class="controls">
+             <input save="yes" id="add_sleep_join" value="10" type="number" min="0" step="1" style="margin-right: 7px;width: 75px;">  секунд</i> </span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Соблюдать интервал</span></label>
+          <div class="controls">
+             <input class="small_input" save='yes' id="msg_interval" value="0" type="number" min="0" step="1">  сообщений</i> <i class="icon-exclamation-sign" data-original-title="Бот не будет отправлять сообщение, если в целевой группе не было написано N сообщений от других пользователей" data-rel="tooltip"></i></span>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>Удалять старые сообщения</span></label>
+          <div class="controls">
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" class="remove_old_messages" value="1" name="change_report_reason" checked="checked">
+                <span>Да</span>
+              </label>
+            </div>
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" class="remove_old_messages" value="0" name="change_report_reason">
+                <span>Нет</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Выбрано сессий</span></label>
+          <div class="controls select_users_div_control">
+             <div class='select_users_div'>
+                <span id="selected_users">0</span> 
+              </div>
+              <i class="icon-user select_users_i"></i>
+          </div>
+        </div>
+        
+
+          <div class="control-group">
+            <div class="message_container">
+            <div class="header_line" id='toolbar'>
+              <button class="btn btn-mini trans msg_bold" data-original-title="Жирный" data-rel="tooltip">
+                <i class="halflings-icon bold"></i>
+              </button>
+              <button class="btn btn-mini trans msg_italic"  data-original-title="Курсив" data-rel="tooltip">
+                <i class="halflings-icon italic"></i>
+              </button>
+              <button class="btn btn-mini trans msg_mono"  data-original-title="Моноширинный" data-rel="tooltip">
+                <i class="halflings-icon text-width"></i>
+              </button>
+              
+              <button class="btn btn-mini trans msg_url_add"  data-original-title="Добавить ссылку" data-rel="tooltip">
+                <i class="halflings-icon font"></i>
+              </button>
+
+              <span class="separator"></span>
+              
+              <button class="btn btn-mini trans msg_forward"  data-original-title="Репост из канала" data-rel="tooltip">
+                <i class="halflings-icon share-alt"></i>
+              </button>
+              <button class="btn btn-mini trans msg_insert_image" data-original-title="Прикрепить фото" data-rel="tooltip">
+                <i class="halflings-icon camera"></i>
+              </button>
+              
+              <button class="btn btn-mini trans msg_inline_query"  data-original-title="Inline Query (@postbot, т.д.)" data-rel="tooltip">
+                <i class="halflings-icon tasks"></i>
+              </button>
+              
+              <span class="separator"></span>
+            
+              <button class="btn btn-mini trans msg_spin"  data-original-title="Спинтакс (рандомизация)" data-rel="tooltip">
+                <i class="halflings-icon random"></i>
+              </button>
+              
+              <span class="separator"></span>
+              
+              <button class="btn btn-mini trans msg_clear"  data-original-title="Удалить сообщение" data-rel="tooltip">
+                <i class="halflings-icon trash"></i>
+              </button>
+              
+
+            </div>
+
+            <span id='message_type' type='text', value=''></span>
+            <span id='message_settings'></span>
+
+            <textarea id="message" rows="10" placeholder="Введите сообщение здесь"></textarea>
+            
+            <span class="with_select_photo">+ ФОТО</span>
+
+            <div class="overflow_cont">
+                <div class="center_content">
+                  <h2 id='ov_head'></h2>
+                  <button class='cancel_overflow_cont'>Отменить</button>
+                </div>
+            </div>
+          </div>
+        </div>
+
+
+        <button id="start_posting" class="btn button-large btn-success">Начать</button>
+      </form>
+    </div>   
+  </div>
+
+<style>
+  .with_select_photo {
+      color: red;
+      font-size: 11px;
+      font-weight: bold;
+      display: none;
+  }
+</style>
+<div class="modal-wrapper" id='modal_choose_url'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите текст и ссылку</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="Google" id='input_urlname'>
+          <input type="text" placeholder="https://google.com" id='input_url'>
+          <button>Вставить</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_inline_query'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите данные</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="@postbot" id='input_botname_query'>
+          <input type="text" placeholder="15c92394a15349" id='input_query'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_forward'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите ссылку на пост в канале</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="https://t.me/test_channel_for_forward/3" id='input_forward_url'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_insert_image'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите ссылку на изображение</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="https://i.imgur.com/E0dconc.jpg" id='input_image_url'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<script src='/js/message_editor.js'></script>
+<style>
+#receivers_text {
+    width: 220px;
+    box-sizing: border-box;
+}
+</style>
+
+<script>
+  SELECTED_USERS = [];
+  PREVIEW_IMAGE = null;
+
+  $('#start_posting').click(function(e) {
+    e.preventDefault();
+
+    var targets = [];
+
+    if ($('#receivers_text').length == 0) {
+      for (let tg of $('.target')) {
+        if ($(tg).val().length > 0) {
+          targets.push($(tg).val());
+        }
+      }
+    } else {
+      for (let i of $('#receivers_text').val().split('\n')) {
+        if (i.trim().length > 0) {
+          targets.push(i.trim());
+        }
+      }
+    }
+
+    var minutes = $('#add_sleep').val();
+    var add_sleep_join = $('#add_sleep_join').val();
+    var opts = get_options()
+    var msg_interval = $('#msg_interval').val();
+
+    let all_groups = false;
+    if ($('#receivers_type').val() == 'auto') {
+      all_groups = true;
+    }
+
+    if (opts.is_inline_query == false && opts.with_file == false && opts.is_repost == false && opts.text == '') {
+      red_log('Сообщение не может быть пустым');
+      return;
+    }
+
+    if (SELECTED_USERS.length == 0) {
+      red_log('Необходимо выбрать хотя бы одну сессию');
+      return;
+    }
+
+    var remove_old_messages = $('input[class=remove_old_messages]:checked').val();
+
+    ws_send({type: 'start_cycle_posting', data: {
+      opts: opts,
+      targets: targets,
+      minutes: minutes,
+      add_sleep_join: add_sleep_join,
+      phones: SELECTED_USERS,
+      all_groups: all_groups,
+      msg_interval: msg_interval,
+      remove_old_messages: remove_old_messages
+    }});
+  });
+
+  $('#receivers_type').change(function() {
+    if ($(this).val() == 'manual') {
+      $('.channel_iter').removeClass('dis')
+    } else {
+      $('.channel_iter').addClass('dis')
+    }
+  })
+
+  $('.msg_insert_image').click(function(e) {
+    e.preventDefault()
+    
+    open_two_input_modal('modal_insert_image').then(function(result) {
+      let url = result['input_image_url']
+      if (url.length == 0) url = 'https://i.imgur.com/E0dconc.jpg'
+      PREVIEW_IMAGE = url
+      if (PREVIEW_IMAGE != null && PREVIEW_IMAGE.length > 3) {
+        $('.with_select_photo').show();
+      } else {
+        $('.with_select_photo').hide();
+      }
+    })
+  })
+
+  function get_options() {
+    let is_repost = false
+    let is_inline_query = false
+    let repost_to = ''
+    let inline_query = ''
+    let inline_query_bot_name = ''
+    let msg_type = get_message_type()
+    if (msg_type.type == 'forward') {
+      is_repost = true;
+      repost_to = msg_type.value;
+    }
+    if (msg_type.type == 'inline_query') {
+      is_inline_query = true;
+      [inline_query_bot_name, inline_query] = msg_type.value.split(':');
+    }
+
+    var receivers = $('#receivers').val() || '';
+    var with_file = false;
+    if (PREVIEW_IMAGE != null && PREVIEW_IMAGE.length > 5) {
+      with_file = true;
+    }
+    let send_messages_options = {
+      text: $('#message').val().trim(),
+      is_repost: is_repost,
+      repost_to: repost_to,
+      with_file: with_file,
+      file_url: PREVIEW_IMAGE,
+      is_inline_query: is_inline_query,
+      inline_query: inline_query,
+      inline_query_bot_name: inline_query_bot_name
+    }
+    return send_messages_options
+  }
+
+  function add_chan_handler() {
+    $('.add_chan').click(function() {
+      let already_have = $('.channel_iter').length;
+      
+      if (already_have >= 3) {
+        var targets = [];
+        for (let tg of $('.target')) {
+          if ($(tg).val().length > 0) {
+            targets.push($(tg).val());
+          }
+        }
+
+        $('.channels_append').remove();
+        $('.channel_iter .controls').html('<textarea id="receivers_text" rows="8"></textarea>');
+        $('#receivers_text').val(targets.join('\n') + '\n')
+
+        return
+      }
+
+      $('.add_chan').remove();
+      let html = `<div class="control-group channel_iter channels_append channel_${already_have+1}">
+          <label class='settings-label'><span></span></label>
+          <div class="controls">
+             <input class='target' type="text" placeholder="@username" /> <i class="icon-plus-sign add_chan"></i>
+          </div>
+        </div>`
+
+      $(html).insertAfter('.channel_' + already_have);
+      add_chan_handler();
+    })
+  }
+
+  add_chan_handler();
+
+  $('.select_users_i').click(function() {
+    open_account_chooser().then(function(users) {
+      SELECTED_USERS = users;
+      $('#selected_users').html(SELECTED_USERS.length);
+      if (SELECTED_USERS.length > 0) {
+        log(`Выбрано <b>${SELECTED_USERS.length}</b> сессий</b>`)
+      }
+    })
+  });
+
+      
+</script>
+
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Информация</h2>
+      <div class="box-icon">
+        <a href="#" class="btn-setting clean_history"><i class="halflings-icon white trash"></i></a>
+      </div>
+    </div>
+    <div class="box-content">
+      <div class="log-content h100vh h100p">  
+          <ul id="log">
+          </ul>
+      </div>
+    </div>   
+  </div>
+
+
+</div>
+
+<div class="account_chooser">
+  <div class="accounts_chooser_content">
+      <div class="box">
+      <div class="box-header">
+        <h2>Выберите аккаунты для работы (всего доступно <span class="how">0</span> аккаунтов)</h2>
+        <div class="box-icon">
+          <a href="#" class="btn-close-modal">
+            <i class="halflings-icon white remove"></i>
+          </a>
+        </div>
+      </div>
+      <div class="box-content">
+        <div class="account_range">
+          <div class="slider sliderRangeAccountsCheck red"></div> <span class="chose_all">выбрать все</span>
+          <div class="field_notice">(<span class="must sliderRangeLabel" style="color:  black;"></span>)</div>
+        </div>
+
+        <div class="inner">
+          <table class="table table-striped table-bordered">
+            <thead class='accounts_list_head_fast'>
+              <tr>
+                <th></th>
+                <th>Аватар</th>
+                <th>Юзернейм</th>
+                <th>Имя</th>
+                <th>Телефон</th>
+                <th>Отлёжка</th>
+              </tr>
+            </thead>   
+            <tbody id='accounts_list_fast'></tbody>
+          </table> 
+        </div>
+        <span class="label label-success lnp btn-fast-success">Принять</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  var account_fast_list = {}
+  function open_account_chooser() {
+    $('.account_chooser').css({display: 'flex'})
+
+    return new Promise((resolve, reject) => {
+      $('.account_chooser .btn-fast-success').off('click')
+      $('.account_chooser .btn-fast-success').click(function() {
+        let accs = getActiveAccounts()
+        console.log(accs)
+        close_account_chooser()
+        resolve(accs)
+      })
+      $('.account_chooser .btn-close-modal').off('click')
+      $('.account_chooser .btn-close-modal').click(function(e) {
+        e.preventDefault()
+        close_account_chooser()
+        resolve([])
+      })
+    })
+  }
+  function close_account_chooser() {
+    unsetActives()
+    $('.account_chooser').css({display: 'none'})
+  }
+  function getActiveAccounts() {
+    var result = []
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      var acc = $(sels[i])
+      if (acc.hasClass('active')) {
+        result.push(acc.attr('phone'))
+      }
+    }
+    return result;
+  }
+  $('.btn-close-modal').click(function(e) {
+    e.preventDefault()
+    close_account_chooser()
+  })
+  function unsetActives() {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      $(sels[i]).removeClass('active')
+    }
+    $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+    $('.sliderRangeAccountsCheck').removeClass('opacity03')
+  }
+
+  function selectByIndex(x, y) {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      if (i+1 >= x && i+1 <= y) {
+        $(sels[i]).addClass('active')
+      } else {
+        $(sels[i]).removeClass('active')
+      }
+    }
+  }
+
+  function set_data_for_fast_choose(data) {
+    var table = ''
+    account_fast_list = data
+
+    $('.account_chooser .box-header .how').html(account_fast_list.length)
+
+    for (var account in data.account_list) {
+        var ac_info = data.account_list[account]
+        var number = account
+
+        var avatar = './img/default.png'
+        if (ac_info.avatar != 'default') {
+          if (ac_info.avatar != null) {
+            avatar = ac_info.avatar
+            avatar = avatar.replace('static/', '')
+          }
+        }
+
+        var username = '<span class="cline">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var phone = ac_info.phone
+        var lives = ac_info.lives
+
+        var cl_lives = 'green'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        table += `<tr phone="${phone}">`
+        table += `<td class="active_row"><i class="icon-ok"></i></td>`
+        table += `<td class="avatar center"><img src="${avatar}" onerror="this.src = './img/default.png'"/></td>`
+        table += `<td class='username'>${username}</td>`
+        table += `<td class='name'>${name}</td>`
+        table += `<td class="phone center">${phone}</td>`
+        table += `<td class="lives center"><span class="${cl_lives}">${lives}</span></td>`
+        table += `</tr>`
+      }
+
+
+      $('#accounts_list_fast').append(table)
+
+      $( ".sliderRangeAccountsCheck" ).slider({
+        range: true,
+        min: 1,
+        max: account_fast_list.length,
+        values: [1, account_fast_list.length],
+        slide: function( event, ui ) {
+          $( ".sliderRangeLabel" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ]);
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          selectByIndex(ui.values[0], ui.values[1])
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          }
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      });
+
+      $('.chose_all').click(function() {
+        if ($(this).hasClass('choseed_all') == false) {
+          var sels = $('#accounts_list_fast tr')
+          for (var i = 0; i < sels.length; i++) {
+            $(sels[i]).addClass('active')
+          }
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+            $('.sliderRangeAccountsCheck').addClass('opacity03')
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+            $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          }
+
+          $(this).addClass('choseed_all')
+          $(this).html('снять выбор')
+        } else {
+          unsetActives()
+          $(this).removeClass('choseed_all')
+          $(this).html('выбрать все')
+        }
+      })
+
+      $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+
+      $('#accounts_list_fast tr').click(function() {
+        if ($(this).hasClass('active') == false) {
+          $(this).addClass('active')
+        } else {
+          $(this).removeClass('active')
+        }
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      })
+  }
+
+
+
+  loading_start();
+  var accounts_info = {};
+
+  $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom", delay: { show: 400, hide: 200 }});
+
+
+
+function msg_sended(data) {
+  let accname = `${data.name}: `
+  log(accname + `Сообщение отправлено: <b>${data.username}</b>`)
+}
+
+
+function ws_error(data) {
+  var phone = data.phone
+  if (data.reason == 'error_connect_to_account') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Ошибка подключения к аккаунту. Возможно аккаунт забанен</span>')
+  }
+
+  if (data.reason == 'need_wait') {
+    log(`${data.name}: <span class="warn_need_wait">Необходимо подождать ${data.seconds} секунд</span>`)
+  }
+  if (data.reason == 'user_restricted') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь ограничен, но не забанен</span>')
+  }
+
+  if (data.reason == 'user_deactivated') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь забанен</span>')
+  }
+
+  if (data.reason == 'operational_error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Сессия занята другим процессом</span>')
+  }
+
+  if (data.reason == 'auth_key_unregistred') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Неверная сессия</span>')
+  }
+
+  if (data.reason == 'username_not_found') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Контакт не найден: ' + data.username + '</span>')
+
+  }
+
+  if (data.reason == 'error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Произошла ошибка: ' + data.message + '</span>')
+  }
+}
+
+  $(document).ready(function() {
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop()
+        ws_send({type: 'get_accounts'});
+        ws_send({type: 'full_account_info'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+      ws_defs(evt);
+    
+      if (data.type == 'full_account_info') set_data_for_fast_choose(f_data);
+
+      if (data.type == 'msg_sended') msg_sended(f_data)
+      if (data.type == 'error') ws_error(f_data)
+
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

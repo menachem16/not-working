@@ -1,0 +1,586 @@
+<link href="css/clonner_editor.css" rel="stylesheet">
+
+
+<div class="page_wrap">
+    <div class="search_bar">
+        <i class="icon-chevron-left search_left"></i> <span class="label label-success selected_lab">Отмечено <span class='selected_msgs_label'>0</span> сообщений</span> <i class="icon-chevron-right search_right"></i>
+
+        <div class="empty_line"></div>
+
+        <button class="btn btn-small btn-primary selected_clean">Снять все отметки</button>
+        <br>
+        <button class="btn btn-small btn-danger remove_selected">Удалить отмеченные сообщения</button>
+        
+        <div class="empty_line"></div>
+
+        <input type="text" class='search_messages' placeholder="Найти сообщения">
+        
+        <br>
+        
+        <div class="search_by_mask_d">
+            <input type="checkbox" id="search_by_mask" checked="checked">
+            <label for="search_by_mask">Искать по маске</label>
+        </div>
+
+        <div class="check_messages">
+            <input type="checkbox" id="mark_messages" checked="checked">
+            <label for="mark_messages">Помечать закладкой</label>
+        </div>
+
+        <div class="remove_last_marks_d">
+            <input type="checkbox" id="remove_last_marks">
+            <label for="remove_last_marks">Снять предыдущие отметки</label>
+        </div>
+        
+        <button class="btn btn-small btn-primary search_messages_btn">Поиск</button>
+
+        <div class="empty_line"></div>
+
+        <input type="text" class='replace_from' placeholder="Что">
+
+        <br>
+
+        <input type="text" class='replace_to' placeholder="На что">
+
+        <br>
+
+        <button class="btn btn-small btn-info replace_mass">Заменить</button>
+    </div>
+
+    <div class="navig">
+        <div class="prev"><i class="icon-caret-left"></i></div>
+        <div class="pages"></div>
+        <div class="next"><i class="icon-caret-right"></i></div>
+    </div>
+
+    <div class="page_body chat_page">
+      <div class="history"></div>
+  </div>
+</div>
+
+<div class="startup">
+    <div class="start_text">
+        <h2>Выберите файл истории</h2>
+        <ul class="files_of_history"></ul>
+    </div> 
+</div>
+
+<div id='edit_mod' class="modal_window">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="inner">
+            <div class="left">Ввелите новое сообщение</div>
+            <div class="right">0</div>
+            <textarea class="message_text" cols="30" rows="10"></textarea>
+            <div class="save">✔</div>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-large btn-danger remove_user">Удалить пользователя и все его сообщения</button>
+        </div>
+    </div>
+</div>
+
+<div id="progress"></div>
+
+<script src="js/clonner_editor.js"></script>
+
+<script>
+
+var DR = '';
+
+function clean_selected() {
+    ls_clear_selected();
+    $('.check_container input').prop('checked', false);
+    $('.selected_msgs_label').html(ls_get_selected().length);
+    $('.user_message').removeClass('mark');
+}
+
+$('.remove_selected').click(function() {
+    let selected = ls_get_selected();
+    if (selected.length == 0) return
+    let count = 0;
+    for (let i of selected) {
+        count += 1;
+        ws_send({type: 'remove_message_from_history', data: {id: i, dr: DR, page: $('.active_page').attr('page')}});
+        $(`.message[msg_id='${i}']`).remove();
+    }
+    
+    ShowToast(`Удалено ${count} сообщений`, 1500);
+});
+
+$(document).ready(function() {
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+    let CURRENT_SEARCH_MESSAGE = 0;
+
+    $(window).scroll(function (event) {
+        var scroll = $(window).scrollTop();
+        if (scroll < 145) {
+            $('.search_bar').css('top', `${145 - scroll}px`);
+        } else {
+            $('.search_bar').css('top', `30px`);
+        }
+    });
+
+    $('.search_left').click(function() {
+        let selected = ls_get_selected();
+        if (selected.length == 0) return
+        if (CURRENT_SEARCH_MESSAGE == 0) {
+            CURRENT_SEARCH_MESSAGE = selected.length - 1;
+        } else {
+            CURRENT_SEARCH_MESSAGE -= 1;
+        }
+
+        let msgid = selected[CURRENT_SEARCH_MESSAGE];
+        ScrollToElement($(`.message[msg_id="${msgid}"]`)[0])
+    })
+
+    $('.search_right').click(function() {
+        let selected = ls_get_selected();
+        if (selected.length == 0) return
+        if (CURRENT_SEARCH_MESSAGE == selected.length - 1) {
+            CURRENT_SEARCH_MESSAGE = 0;
+        } else {
+            CURRENT_SEARCH_MESSAGE += 1;
+        }
+
+        let msgid = selected[CURRENT_SEARCH_MESSAGE];
+        ScrollToElement($(`.message[msg_id="${msgid}"]`)[0])
+    })
+
+    $('.replace_mass').click(function(e) {
+        e.preventDefault();
+        let replace_from = $('.replace_from').val().toLowerCase();
+        let replace_to = $('.replace_to').val();
+        let count = 0;
+
+        for (let msg of $('.message .user_message')) {
+            let text = $(msg).html().toLowerCase();
+            if (text.split(' ').indexOf(replace_from) >= 0) {
+                count += 1;
+                let main = $(msg).parent().parent();
+                let msg_id = $(main).attr('msg_id');
+                let msg_new = text.replace(new RegExp(replace_from, 'g'), replace_to);
+
+                ws_send({type: 'save_history_diff', data: {id: msg_id, msg: msg_new, img: null, file: $('.active_page').attr('page'), dr: DR}});
+
+                $(msg).html(msg_new);
+            }
+        }
+
+        ShowToast(`Отредактировали ${count} сообщений`, 1500);
+    })
+
+    $('.search_messages_btn').click(function(e) {
+        e.preventDefault();
+
+        CURRENT_SEARCH_MESSAGE = 0;
+
+        $('.user_message').removeClass('mark');
+
+        let mark_messages = $('#mark_messages').prop('checked');
+        let search_by_mask = $('#search_by_mask').prop('checked');
+        let search_mask = $('.search_messages').val().toLowerCase();
+        let clean_sels = $('#remove_last_marks').prop('checked');
+
+        if (clean_sels) {
+            clean_selected();
+        }
+
+        for (let msg of $('.message .user_message')) {
+            let text = $(msg).html().toLowerCase();
+            let found = false;
+
+            if (search_by_mask) {
+                let regex = new RegExp(search_mask, 'gmi');
+                if (text.match(regex)) found = true; 
+            } else {
+                if (text.split(' ').indexOf(search_mask) >= 0) found = true;
+            }
+
+            if (found) {
+                $(msg).addClass('mark');
+                if (mark_messages) {
+                    let main = $(msg).parent().parent();
+                    $(main).find('.check_container input').prop('checked', true);
+                    ls_set_selected($(main).attr('msg_id'));
+                    $('.selected_msgs_label').html(ls_get_selected().length);
+                }
+            }
+        }
+    })
+
+    $('.selected_clean').click(function(e) {
+        e.preventDefault();
+        clean_selected();
+    });
+
+    WS.onopen = function() {
+        loading_stop()
+        ws_send({type: 'get_files_history'});
+        ws_send({type: 'get_accounts'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+      ws_defs(evt);
+
+      if (data.type == 'get_files_history_cb') get_files_history_cb(f_data)
+      if (data.type == 'remove_user_from_history_cb') remove_user_from_history_cb(f_data)
+      if (data.type == 'get_files_history_pages_cb') get_files_history_pages_cb(f_data)
+    };
+  })
+    
+  var BASE_PATH = '';
+  var PAGES = [];
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+  function sort_unique(arr) {
+      if (arr.length === 0) return arr;
+      arr = arr.sort(function (a, b) { return a*1 - b*1; });
+      var ret = [arr[0]];
+      for (var i = 1; i < arr.length; i++) {
+        if (arr[i-1] !== arr[i]) {
+          ret.push(arr[i]);
+        }
+      }
+      return ret;
+    }
+    function ls_set_selected(idx) {
+        let selected = ls_get_selected();
+        selected.push(idx);
+        localStorage.setItem('selected_messages', selected);
+      }
+
+      function ls_get_selected() {
+        let selected = localStorage.getItem('selected_messages').split(',');
+        let selected_ints = [];
+        for (let idx of selected) {
+            if (idx == 'null') continue;
+            selected_ints.push(parseInt(idx));
+        }
+
+        return sort_unique(selected_ints);
+      }
+
+      function ls_clear_selected() {
+        localStorage.setItem('selected_messages', null)
+      }
+
+    $('.page_body').on('click', '.checkbox_line input', function() {
+        if ($(this).is(':checked')) {
+            ls_set_selected($(this).attr('msg_id'))
+        }
+        $('.selected_msgs_label').html(ls_get_selected().length)
+    })
+
+    $('.files_of_history').on('click', '.remove_hist', function(e) {
+        ws_send({type: 'remove_history_dir', data: {dr: $(this).attr('dr')}});
+        setTimeout(function() {ws_send({type: 'get_files_history'})}, 500)
+    });
+
+    $('.remove_user').click(function() {
+        let id = parseInt($('.modal_window').attr('from_id'));
+        ws_send({type: 'remove_user_from_history', data: {id: id, dr: DR}});
+        $('.modal_window').hide();
+        loading_start();
+    })
+
+    $('.page_body').on('click', '.remove_msg', function() {
+        let id = parseInt($(this).parent().parent().attr('msg_id'));
+        ws_send({type: 'remove_message_from_history', data: {id: id, dr: DR, page: $('.active_page').attr('page')}});
+        $(`.message[msg_id='${id}']`).remove();
+        ShowToast(`Удалено`, 1500);
+    })
+
+    $('.pages').on('click', '.page', function() {
+        let basePath = 'history_exported/' + DR + '/';
+        let usersFile = basePath + 'users.json';
+        let historyFile = basePath + $(this).attr('page');
+        for(let pg of $('.pages .page')) {$(pg).removeClass('active_page')}
+        $(this).addClass('active_page');
+        clean_selected();
+        render({history: historyFile, files: basePath, users: usersFile});
+    });
+
+  function remove_user_from_history_cb(data) {
+    let id = data['id'];
+    loading_stop();
+    $(`.message[from_id='${id}']`).remove();
+    ShowToast(`Пользователь и все его сообщения удалены`, 1500);
+  }
+
+  function get_files_history_pages_cb(data) {
+    let basePath = 'history_exported/' + data.dr + '/';
+    let usersFile = basePath + 'users.json';
+    DR = data.dr;
+    $('.modal_window').attr('history', data.history);
+    $('.startup').hide();
+    BASE_PATH = basePath;
+    PAGES = data.pages;
+    $('.pages').html('');
+    for (let page in PAGES) {
+        $('.pages').append(`<div class="page" page="${PAGES[page]}">${parseInt(page) + 1}</div>`)
+    }
+    $('.pages .page').first().addClass('active_page');
+    $('.navig').show();
+    let historyFile = basePath + data.pages[0];
+    render({history: historyFile, files: basePath, users: usersFile});
+  }
+
+   function get_files_history_cb(data) {
+        $('.files_of_history').html('');
+
+        ls_clear_selected()
+
+        for (let dr of data.dirs) {
+            $('.files_of_history').append(`<li><a href="#" dr='${dr}' class='history_dir'>${dr}</a> <span class='remove_hist' dr='${dr}'><i class="icon-remove"></i></span></li>`);
+        }
+
+        $('.history_dir').click(function(e) {
+            e.preventDefault();
+            DR = $(this).attr('dr');
+            ws_send({type: 'get_files_history_pages', data: {dr: DR}});
+        })
+    }
+
+
+    $('.close').click(function() {$('.modal_window').hide()});
+
+    $('.save').click(function() {
+        let message = $('.message_text').val();
+        let id  = parseInt($('.modal_window').find('.right').html());
+
+        ws_send({type: 'save_history_diff', data: {
+            id: id, 
+            msg: message.replace(/(<br>)/g, '\n'), 
+            img: null, 
+            file: $('.active_page').attr('page'),
+            dr: DR
+        }});
+
+        ShowToast('Сохранено', 800);
+        $('#msg' + id).find('.user_message').html(message);
+
+        setTimeout(function() {$('.modal_window').hide()}, 100);
+        
+    });
+
+var current_step = 1;
+var max_length = 2;
+
+function shedule(filepaths, data, start=0) {
+    let {history, users} = data;
+    max_length = history.length;
+
+    for (let x = start; x < history.length; x++) {
+        current_step = x
+        if (x - start > 50) {
+            return setTimeout(function() {
+                shedule(filepaths, data, x)
+            }, 20)
+        }
+        
+        setTimeout(() => {
+            render_line(filepaths, history[x], users);
+        }, x)
+    }
+}
+
+function render_line(filepaths, line, users) {
+    let user = get_user(users, line.from_id);
+    let name = 'DELETED';
+    let avatar = null;
+    let date = utc_to_date(line.date)
+    let html = '';
+
+    line.message = line.message.replace(/(?:\r\n|\r|\n)/g, '<br>');
+    line.message = line.message.trim();
+
+    if (user != null) {
+        name = `${user.first_name} ${user.last_name || ''}`;
+        if (user.photo.length > 0) {
+            avatar = filepaths.files + user.photo;
+        }
+    }
+
+    if (line.message_type == 'text') {
+        html =  text_message(line.message.trim());
+        $(`#msg${line.id}`).attr('can_edit', '1')
+
+    }
+    if (line.message_type == 'Photo') {
+        html = photo_message(line, line.message);
+    }
+    if (line.message_type == 'Sticker') {
+        html = sticker_message(line);
+    }
+    if (line.message_type == 'MediaDocument' || line.message_type == 'Video') {
+        html = video_message(line);
+    }
+    if (line.message_type == 'Audio') {
+        html = audio_message(line);
+    }
+
+    let is_admin = false;
+    if (typeof user !== 'undefined' && typeof user.is_admin !== 'undefined') {
+        is_admin = user.is_admin;
+    }
+    $('.history').append(base_message(line.id, avatar, name, date, line.reply_to_msg_id, line.forward, html, line.from_id, is_admin));
+
+    $('.reply_to_href').on('click', function() {
+        GoToMessage($(this).attr('targ'));
+    });
+
+    if (line.message_type == 'text' && !line.forward) {
+        $(`#msg${line.id}`).attr('can_edit', '1')
+    } else {
+        $(`#msg${line.id}`).attr('can_edit', '0')
+    }
+    
+    if ($(`#msg${line.id}`).attr('can_edit') == '1') {
+        $(`#msg${line.id}`).hover(function() {
+            $(this).find('.edit_btn').show();
+        }, function() {
+            $(this).find('.edit_btn').hide();
+        });
+        $(`#edit${line.id}`).click(function() {
+            let text = $(`#msg${line.id}`).find('.user_message').html();
+            show_edit_modal(line.id, text, line.from_id);
+        });
+    }
+
+    requestAnimationFrame(() => {
+        let len = $('.message').length;
+        let percent = parseInt(100/max_length*len);
+        if (len < max_length) {
+            $('#progress').html('Загружено: ' + len + ' из ' + max_length + ' (' + percent + '%)');
+        } else {
+            setTimeout(function() {
+                $('#progress').remove();
+            }, 3000)
+        }
+    });
+    
+   
+}
+
+function render(filepaths) {
+    $('.history').html('')
+    $.getJSON(filepaths.history, function(history) {
+        $.getJSON(filepaths.users, function(users) {
+            shedule(filepaths, {history, users});
+        });
+    });
+}
+
+
+ function show_edit_modal(id, msg, from_id) {
+    msg = msg.replace(/(<br>)/g, '\n');
+    $('.message_text').val(msg);
+    $('.right').html(id);
+    $('.modal_window').attr('from_id', from_id);
+    $('.modal_window').attr('msg_id', id);
+    $('.modal_window').show();
+}
+
+window.onclick = function(event) {
+  if (event.target == document.getElementById("edit_mod")) {
+    $('.modal_window').hide();
+  }
+}
+
+function get_user(from, id) {
+    for (let line of from) {
+        if (line.id == id) {
+            if (line.first_name == null) {
+                return null;
+            }
+            return line;
+        }
+    }
+}
+function format_dt(x) {
+    return x < 10 ? '0' + x : x; 
+}
+function utc_to_date(utc) {
+    let dt = new Date(utc * 1000);
+    return format_dt(dt.getHours()) + 
+        ':' + format_dt(dt.getMinutes()) + 
+        ':' + format_dt(dt.getSeconds());
+}
+function avatar(src) {
+    if (src == null) return null;
+    return `<img class="initials ava" src="${src}">`
+}
+function base_message(id, avatar_src, name, date, reply, forward, body, from_id, is_admin) {
+
+    let forw = '';
+    let reply_html = '';
+
+    if (is_admin) {
+        forw += `<div class="adm details">admin </div>`;
+    }
+    if (forward) {
+        forw += `<div class="forw details">forward </div>`;
+    }
+    if (reply != null) {
+        reply_html = `<div class="reply_to details"><a href="#msg${reply}" targ="${reply}" class="reply_to_href">reply </a></div>`;
+    }
+    
+    return `<div class="message default clearfix" id="msg${id}" from_id='${from_id}' msg_id='${id}' can_edit='0'>
+      <div class="pull_left userpic_wrap">
+        <div class="userpic userpic2" style="width: 42px; height: 42px">
+          ${avatar(avatar_src) || '<div class="initials" style="line-height: 42px"></div>'}
+        </div>
+      </div>
+      <div class="body">
+        <div class="pull_right date details"> ${date}</div>
+        <div class="from_name"> ${name}  ${reply_html} ${forw}</div>
+        ${body}
+      </div>
+
+      <div class="edit_line">
+        <i id='edit${id}' class="icon-pencil edit_btn" to_id='${id}' style="display: none;"></i>
+        <i class="icon-trash rd_color remove_msg"></i>
+      </div>
+      
+      <div class="checkbox_line">
+        <label class="check_container">
+          <input type="checkbox" msg_id='${id}'>
+          <span class="checkmark"></span>
+        </label>
+      </div>
+    </div>`
+}
+function text_message(message) {
+    return `<div class="text user_message"> ${message} </div>`
+}
+function photo_message(line, msg) {
+    let html = '';
+    if (msg.length > 0) {
+        html = text_message(msg);
+    }
+    console.log(line)
+    return `<div class="media_wrap clearfix"><div class="place_some">PHOTO: ${line.id}</div></div>` + html
+}
+function sticker_message(line) {
+    return `<div class="place_some">STICKER: ${line.id}</div>`
+}
+function video_message(line) {
+    return `<div class="media_wrap clearfix"><div class="place_some">VIDEO: ${line.id}</div></div>`
+}
+function audio_message(line) {
+    return `<div class="media_wrap clearfix"><div class="place_some">AUDIO: ${line.id}</div></div>`
+}
+
+
+</script>

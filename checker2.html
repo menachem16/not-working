@@ -1,0 +1,1302 @@
+<script type="text/javascript" src="//unpkg.com/xlsx/dist/shim.min.js"></script>
+<script type="text/javascript" src="//unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+<div class="row-fluid">
+  <div class="box span7">
+    <div class="box-header" data-original-title="">
+      <h2>Настройки</h2>
+    </div>
+    <div class="box-content">
+        <div class="control-group">
+          <label class="settings-label"><span>Выбрано сессий для работы</span></label>
+          <div class="controls select_users_div_control">
+             <div class="select_users_div">
+                <span id="selected_users">0</span> 
+              </div>
+              <i class="icon-user select_users_i"></i>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>Телефонные номера</span></label>
+          <div class="controls">
+
+            <div class="added_contacts_div">
+                <span id="added_contacts">0</span> 
+              </div>
+              <i class="icon-plus added_contacts_i"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Задержка во время работы</span></label>
+          <div class="controls">
+             <input class="small_input" save="yes" id="check_sleep" value="10" type="number" min="1" step="1"> секунд <i class="icon-exclamation-sign" data-original-title="Задержка необходима для того, чтобы проверка телефонов была удачной. Telegram-сервер может ограничивать аккаунты на добавиление телефонов в контакты различными способами" data-rel="tooltip"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Добавлять за раз</span></label>
+          <div class="controls">
+             <input class="small_input" save="yes" id="add_per_iteration" value="1" type="number" min="1" step="1"> контактов <i class="icon-exclamation-sign" data-original-title="Нет однозначных рекомендаций для этого параметра. Рекомендуемое значение может меняться в зависимости от анти-спам системы Telegram на текущий момент" data-rel="tooltip"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Максимальный FLOOD_WAIT</span></label>
+          <div class="controls">
+             <input class="small_input" save="yes" id="max_flood_wait" value="250" type="number" min="1" step="1"> секунд <i class="icon-exclamation-sign" data-original-title="Если Telegram ограничит аккаунт на N-е количество секунд, аккаунт будет ожидать, пока это время пройдет и продолжит работу. Если ограничение будет более заданного времени, аккаунт закончит работу принудительно" data-rel="tooltip"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Количество потоков</span></label>
+          <div class="controls">
+             <input class="small_input" save="yes" id="threads_count" value="5" type="number" min="1" step="1">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Лимит номеров на аккаунт</span></label>
+          <div class="controls">
+             <input class="small_input" save="yes" id="phones_limit" value="50" type="number" min="1" step="1">
+          </div>
+        </div>
+
+
+        <button id="start_checker" class="btn btn-info"> <i class="icon-play"></i> Начать</button>
+
+    </div>  
+  </div>
+
+  <div class="box span5">
+    <div class="box-header" data-original-title="">
+      <h2>Лог работы</h2>
+    </div>          
+    <div class="box-content">
+      <div class="log-content">  
+          <ul id="log"></ul>
+
+      </div>
+      <div class="progress progress-warning progress-striped active">
+        <div class="bar" style="width: 0%"></div>
+        <div class="numbers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row-fluid checker_content">   
+  <div class="box span12">
+    <div class="box-header" data-original-title="">
+      <h2>Найдено в Telegram</h2>
+    </div>
+    <div class="box-content checker_content_box">
+     <table id="table_id" class="display">
+        <thead>
+            <tr>
+                <th>Телефон</th>
+                <th>ID</th>
+                <th>Юзернейм</th>
+                <th>Имя</th>
+                <th>Онлайн</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row-fluid checker_content">   
+  <div class="box span7">
+    <div class="box-header">
+      <h2>Фильтрация</h2>
+    </div>
+    <div class="box-content">
+
+      <div class="line-b">
+        <h2>Колонки</h2>
+
+        <div class="control-group">
+          <div class="controls">
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_export_phone" checked="checked">
+              Телефон
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_export_id">
+              ID
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_export_username" checked="checked">
+              Юзернейм
+            </label>
+            
+            <label class="checkbox">
+              <input type="checkbox" id="filter_export_name">
+              Имя
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_export_status" checked="checked">
+              Онлайн
+            </label>
+
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="line-b">
+        <h2>Включить тех, кто:</h2>
+
+        <div class="control-group">
+          <div class="controls">
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_ignore_no_username">
+              Не имеет юзернейма
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox"  id="filter_ignore_online_now" checked="checked">
+              Онлайн прямо сейчас
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_ignore_recently" checked="checked">
+              Был в сети недавно
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_ignore_last_week" checked="checked">
+              Заходил на этой неделе
+            </label>
+            
+            <label class="checkbox">
+              <input type="checkbox" id="filter_ignore_last_month" checked="checked">
+              Заходил в этом месяце
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="filter_ignore_long_time_ago">
+              Не заходил более месяца
+            </label>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="line-b">
+        <h2>Если видно время онлайна</h2>
+
+        <div class="control-group">
+          <div class="controls">
+
+            <label class="checkbox">
+              <input type="checkbox" id="was_online_add_export" checked="checked">
+              Добавить в экспорт
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="export_all">
+              Экспортировать все статусы
+            </label>
+
+            <div class="arrow_down">
+              <i class="icon-arrow-down"></i>
+            </div>
+
+            <span class="pr6 dd4">Точность:</span>
+
+            <label class="radio pr6 dd4">
+              <input type="radio" name="optionsRadios" id="check_hours" value="check_hours" checked="">часы
+            </label>
+
+            <label class="radio dd4">
+              <input type="radio" name="optionsRadios" id="check_days" checked="checked" value="check_days">дни
+            </label>
+            
+            
+
+            <div class="controls mt4">
+              <div class="slider sliderRange black"></div>
+              <div class="field_notice">Был онлайн: <span class="must sliderRangeLabelStatus">от 0 до 30 часов назад</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  
+  <div class="box span5">
+    <div class="box-header" data-original-title="">
+      <h2>Экспорт</h2>
+    </div>
+    <div class="box-content">
+      
+      <div class="control-group">
+          <label class="settings-label"><span>Всего контактов</span></label>
+          <div class="controls">
+             <input class="small_input contacts_count_all" value="0" type="number" min="0" step="1" style="pointer-events: none;">
+          </div>
+      </div>
+
+      <div class="control-group">
+          <label class="settings-label"><span>После фильтрации</span></label>
+          <div class="controls">
+             <input class="small_input contacts_count" value="0" type="number" min="0" step="1" style="pointer-events: none;">
+          </div>
+      </div>
+      
+
+      <div class="control-group">
+        <label class="settings-label"><span>Формат экспорта</span></label>
+        <div class="controls">
+           <select id="export_type">
+            <option value="txt">Текстовый файл</option>
+            <option value="excel">Файл excel</option>
+          </select>
+        </div>
+      </div>
+      
+      <button id="start_export" class="btn btn-success"> <i class="icon-share"></i> Экспорт</button>
+
+    </div>
+  </div>
+
+
+
+</div>
+
+<style>
+  .log-content {
+      max-height: 300px !important;
+  }
+  #log {
+    overflow: hidden;
+  }
+  .slider {
+    width: 250px;
+    display: block;
+  }
+  #start_checker {
+    width: 200px;
+  }
+  #start_export {
+    width: 100%;
+  }
+  .arrow_down {
+    text-align: center;
+    margin: 10px 0px;
+  }
+  .arrow_down i {
+    font-size: 16px;
+  }
+  .mt4 {
+    margin-top: 4px;
+  }
+  .pr15 {
+    padding-right: 15px;
+  }
+  .pr6 {
+    padding-right: 6px;
+  }
+  .field_notice {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0;
+      font-size: 12px;
+  }
+  .slider {
+      display: inline-block;
+      width: 100%;
+      max-width: 300px;
+  }
+  .control-label {
+      font-size: 14px;
+  }
+  .line-b {
+    display: inline-block;
+    margin-right: 50px;
+    vertical-align: top;
+  }
+  .progress {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 5px;
+    width: calc(100% - 20px);
+  }
+  .progress .numbers {
+      position: absolute;
+      left: calc(50% - 30px);
+      top: -2px;
+      font-size: 9px;
+  }
+  .controls i {
+    vertical-align: middle;
+    padding-left: 3px;
+  }
+  .small_input {
+    margin-bottom: 2px !important;
+  }
+  select {
+    margin-top: 5px;
+  }
+  input[type=search] {
+    margin-top: 5px;
+  }
+  select[name=table_id_length] {
+    width: 100px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+  table.dataTable.no-footer {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 12px;
+  }
+  table.dataTable thead th {
+    border-bottom: 1px solid #ddd;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: none;
+  }
+  .added_contacts_div {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-top: 5px;
+    font-size: 15px;
+  }
+  .added_contacts_i {
+    color: #472dd2;
+    font-size: 20px;
+    vertical-align: middle;
+    padding-left: 6px;
+    cursor: pointer;
+    line-height: 0;
+  }
+  #add_contacts_area {
+    width: 90%;
+    box-sizing: border-box;
+    height: 180px;
+  }
+  table.dataTable thead .sorting_asc {
+    text-align: left;
+  }
+  table.dataTable thead .sorting {
+    text-align: left;
+  }
+</style>
+
+
+
+
+<div class="account_chooser">
+  <div class="accounts_chooser_content">
+      <div class="box">
+      <div class="box-header">
+        <h2>Выберите аккаунты для работы (всего доступно <span class="how">0</span> аккаунтов)</h2>
+        <div class="box-icon">
+          <a href="#" class="btn-close-modal">
+            <i class="halflings-icon white remove"></i>
+          </a>
+        </div>
+      </div>
+      <div class="box-content">
+        <div class="account_range">
+          <div class="slider sliderRangeAccountsCheck red"></div> <span class="chose_all">выбрать все</span>
+          <div class="field_notice">(<span class="must sliderRangeLabel" style="color:  black;"></span>)</div>
+        </div>
+
+        <div class="inner">
+          <table class="table table-striped table-bordered">
+            <thead class='accounts_list_head_fast'>
+              <tr>
+                <th></th>
+                <th>Аватар</th>
+                <th>Юзернейм</th>
+                <th>Имя</th>
+                <th>Телефон</th>
+                <th>Отлёжка</th>
+              </tr>
+            </thead>   
+            <tbody id='accounts_list_fast'></tbody>
+          </table> 
+        </div>
+        <span class="label label-success lnp btn-fast-success">Принять</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_choose_phones'>
+  <div class="modal">
+    <div class="head">
+      <a class="btn-close trigger" href="javascript:;"></a>
+    </div>
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Добавьте телефонные номера</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <textarea id='add_contacts_area'></textarea>
+          <button input='#add_contacts_area'>Добавить</button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+   var parser_slider_type = 'days'
+
+  $( ".sliderRange" ).slider({
+    range: true,
+    min: 0,
+    max: 60,
+    values: [ 0, 30 ],
+    slide: function( event, ui ) {
+      var type = 'часов';
+      if (parser_slider_type == 'days') type = 'дней';
+      $( ".sliderRangeLabelStatus" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ] + " " + type + " назад" );
+      $('.contacts_count').val(count_export_lines());
+    }
+  });
+
+  var currentText = $('.sliderRangeLabelStatus').text();
+  $('.sliderRangeLabelStatus').text(currentText.replace('часов', 'дней'));
+
+  $("#check_hours, #check_days").change(function () {
+    var currentText = $('.sliderRangeLabelStatus').text();
+    if ($("#check_hours").is(":checked")) {
+        parser_slider_type = 'hours';
+        $('.sliderRangeLabelStatus').text(currentText.replace('дней', 'часов'));
+    }
+    else if ($("#check_days").is(":checked")) {
+        parser_slider_type = 'days';
+        $('.sliderRangeLabelStatus').text(currentText.replace('часов', 'дней'));
+    }
+    $('.contacts_count').val(count_export_lines());
+  }); 
+
+
+  $('#start_export').click(function() {
+    if ($('#export_type').val() == 'txt') {
+      var data = get_export_text();
+      var count = parseInt($('.contacts_count').val());
+
+      if (count == 0) {
+        red_log('Нет ни одного подходящего контакта для экспорта');
+        return;
+      }
+
+      var textFile = new Blob([data], {type: 'text/plain'});
+      invokeSaveAsDialog(textFile, 'checker_export.txt');
+    } 
+
+    if ($('#export_type').val() == 'excel') {
+      var data = get_export_array();
+       
+      var wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
+      XLSX.writeFile(wb, "checker_export.xlsx");
+    }
+  })
+
+
+  function get_export_array() {
+    var filter_export_phone = $('#filter_export_phone').is(':checked');
+    var filter_export_id = $('#filter_export_id').is(':checked');
+    var filter_export_username = $('#filter_export_username').is(':checked');
+    var filter_export_name = $('#filter_export_name').is(':checked');
+    var filter_export_status = $('#filter_export_status').is(':checked');
+
+    var filter_ignore_no_username = $('#filter_ignore_no_username').is(':checked');
+    var filter_ignore_online_now = $('#filter_ignore_online_now').is(':checked');
+    var filter_ignore_recently = $('#filter_ignore_recently').is(':checked');
+    var filter_ignore_last_week = $('#filter_ignore_last_week').is(':checked');
+    var filter_ignore_last_month = $('#filter_ignore_last_month').is(':checked');
+    var filter_ignore_long_time_ago = $('#filter_ignore_long_time_ago').is(':checked');
+    
+    var was_online_add_export = $('#was_online_add_export').is(':checked');
+    
+
+    var status_time_slides = $(".sliderRange").slider("values");
+    var export_array = [];
+
+    var export_all = $('#export_all').is(':checked');
+    if (export_all) {
+      status_time_slides = [0, 99999999999];
+      filter_ignore_online_now = false;
+      filter_ignore_recently = false;
+      filter_ignore_last_week = false;
+      filter_ignore_last_month = false;
+      filter_ignore_long_time_ago = false;
+    }
+
+    var export_data = [];
+    for (var _id in STATUSES_CACHE) {
+      var [phone, username, name, status] = STATUSES_CACHE[_id];
+      var smore = status_get_more(status);
+      var stype = status_get_type(status);
+      var ignore_row = false;
+
+      if (was_online_add_export == false && stype == 'known') {
+        ignore_row = true; 
+      }
+
+      if (filter_ignore_online_now) {
+        if (smore == 'OnlineNow' || (stype == 'known' && parseInt(stype) <= 0)) {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_recently) {
+        if (smore == 'Recently') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_last_week) {
+        if (smore == 'LastWeek') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_last_month) {
+        if (smore == 'LastMonth') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_long_time_ago) {
+        if (smore == 'LongTime') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_no_username) {
+        if (username.length == 0) {
+          ignore_row = true; 
+        }
+      }
+
+      if (ignore_row == false) {
+        if (was_online_add_export) {
+          if (stype == 'known') {
+            var hours_ago = parseInt(smore);
+            var [smin, smax] = status_time_slides;
+            if (parser_slider_type == 'days') {
+              smin = smin * 24;
+              smax = smax * 24;
+            }
+            if (hours_ago > smax || hours_ago < smin) {
+                ignore_row = true; 
+            }
+          }
+        }
+      }
+
+      if (ignore_row == false) {
+        export_data.push([phone, _id, username, name, status]);
+      }
+    }
+
+    var its_first_line = true;
+
+    for (var exp of export_data) {
+      var [phone, _id, username, name, status] = exp;
+      var line = [];
+      var header = [];
+
+      if (filter_export_phone) {
+        line.push(phone);
+        header.push('Phone');
+      }
+      if (filter_export_id) {
+        line.push(_id);
+        header.push('ID');
+      }
+      if (filter_export_username) {
+        line.push(username.length > 0 ? username : "noname");
+        header.push('Username');
+      }
+      if (filter_export_name) {
+        line.push(name);
+        header.push('Name');
+      }
+      if (filter_export_status) {
+        line.push(status_to_string(status));
+        header.push('Status');
+      }
+
+      if (its_first_line) {
+        export_array.push(header);
+        its_first_line = false;
+      }
+
+      export_array.push(line);
+
+      
+    }
+
+    return export_array;
+  }
+
+
+
+
+  function count_export_lines() {
+    var x = get_export_text().split('\n').length - 1;
+    return x;
+  }
+
+  $('#filter_export_phone, #filter_export_id, #filter_export_username, #filter_export_name, #filter_export_status, #filter_ignore_no_username, #filter_ignore_online_now, #filter_ignore_recently, #filter_ignore_last_week, #filter_ignore_last_month, #filter_ignore_long_time_ago, #was_online_add_export, #export_all').change(function () {
+    console.log('ok')
+    $('.contacts_count').val(count_export_lines());
+  })
+
+  $('#export_all').change(function () {
+     var checked = $('#export_all').is(':checked');
+     if (checked == true) {
+      $('#filter_ignore_recently').parent().addClass('dis');
+      $('#filter_ignore_online_now').parent().addClass('dis');
+      $('#filter_ignore_last_month').parent().addClass('dis');
+      $('#filter_ignore_last_week').parent().addClass('dis');
+      $('#filter_ignore_long_time_ago').parent().addClass('dis');
+      $('#was_online_add_export').parent().addClass('dis');
+      $( ".sliderRange" ).parent().addClass('dis');
+      $('.dd4').addClass('dis');
+     } else {
+      $('#filter_ignore_recently').parent().removeClass('dis');
+      $('#filter_ignore_online_now').parent().removeClass('dis');
+      $('#filter_ignore_last_month').parent().removeClass('dis');
+      $('#filter_ignore_last_week').parent().removeClass('dis');
+      $('#filter_ignore_long_time_ago').parent().removeClass('dis');
+      $('#was_online_add_export').parent().removeClass('dis');
+      $( ".sliderRange" ).parent().removeClass('dis');
+      $('.dd4').removeClass('dis');
+     }
+  })
+
+  function get_export_text() {
+    var filter_export_phone = $('#filter_export_phone').is(':checked');
+    var filter_export_id = $('#filter_export_id').is(':checked');
+    var filter_export_username = $('#filter_export_username').is(':checked');
+    var filter_export_name = $('#filter_export_name').is(':checked');
+    var filter_export_status = $('#filter_export_status').is(':checked');
+
+    var filter_ignore_no_username = $('#filter_ignore_no_username').is(':checked');
+    var filter_ignore_online_now = $('#filter_ignore_online_now').is(':checked');
+    var filter_ignore_recently = $('#filter_ignore_recently').is(':checked');
+    var filter_ignore_last_week = $('#filter_ignore_last_week').is(':checked');
+    var filter_ignore_last_month = $('#filter_ignore_last_month').is(':checked');
+    var filter_ignore_long_time_ago = $('#filter_ignore_long_time_ago').is(':checked');
+    
+    var was_online_add_export = $('#was_online_add_export').is(':checked');
+
+    var status_time_slides = $(".sliderRange").slider("values");
+    var export_text = '';
+
+    var export_all = $('#export_all').is(':checked');
+    if (export_all) {
+      status_time_slides = [0, 99999999999];
+      filter_ignore_online_now = false;
+      filter_ignore_recently = false;
+      filter_ignore_last_week = false;
+      filter_ignore_last_month = false;
+      filter_ignore_long_time_ago = false;
+    }
+
+    var export_data = [];
+    for (var _id in STATUSES_CACHE) {
+      var [phone, username, name, status] = STATUSES_CACHE[_id];
+      var smore = status_get_more(status);
+      var stype = status_get_type(status);
+      var ignore_row = false;
+
+      if (was_online_add_export == false && stype == 'known') {
+        ignore_row = true; 
+      }
+
+      if (filter_ignore_online_now) {
+        if (smore == 'OnlineNow' || (stype == 'known' && parseInt(stype) <= 0)) {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_recently) {
+        if (smore == 'Recently') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_last_week) {
+        if (smore == 'LastWeek') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_last_month) {
+        if (smore == 'LastMonth') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_long_time_ago) {
+        if (smore == 'LongTime') {
+          ignore_row = true; 
+        }
+      }
+
+      if (filter_ignore_no_username) {
+        if (username.length == 0) {
+          ignore_row = true; 
+        }
+      }
+
+      if (ignore_row == false) {
+        if (was_online_add_export) {
+          if (stype == 'known') {
+            var hours_ago = parseInt(smore);
+            var [smin, smax] = status_time_slides;
+            if (parser_slider_type == 'days') {
+              smin = smin * 24;
+              smax = smax * 24;
+            }
+            if (hours_ago > smax || hours_ago < smin) {
+              ignore_row = true; 
+            }
+          }
+        }
+      }
+
+      if (ignore_row == false) {
+        export_data.push([phone, _id, username, name, status]);
+      }
+    }
+
+    for (var exp of export_data) {
+      var [phone, _id, username, name, status] = exp;
+      var line = '';
+      if (filter_export_phone) line += phone;
+
+      if (line.length > 0 && line.slice(-1) != ':') line += ':';
+
+      if (filter_export_id) line += _id;
+
+      if (line.length > 0 && line.slice(-1) != ':') line += ':';
+
+      if (filter_export_username) line += username.length > 0 ? username : "noname";
+
+      if (line.length > 0 && line.slice(-1) != ':') line += ':';
+
+      if (filter_export_name) line += name;
+
+      if (line.length > 0 && line.slice(-1) != ':') line += ':';
+
+      if (filter_export_status) line += status_to_string(status);
+
+      if (line.length > 0 && line.slice(-1) != ':') line += ':';
+
+      if (line.slice(-1) == ':') {
+        line = line.substring(0, line.length - 1);
+      }
+
+      export_text += line + '\r\n';
+    }
+
+    return export_text;
+  }
+
+  function ws_error(data) {
+  var phone = data.phone
+  if (data.reason == 'error_connect_to_account') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Ошибка подключения к аккаунту. Возможно аккаунт забанен</span>')
+  }
+
+  if (data.reason == 'need_wait') {
+    log(`${data.name}: <span class="warn_need_wait">Необходимо подождать ${data.seconds} секунд</span>`)
+  }
+  if (data.reason == 'user_restricted') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь ограничен, но не забанен</span>')
+  }
+
+  if (data.reason == 'user_deactivated') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь забанен</span>')
+  }
+
+  if (data.reason == 'operational_error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Сессия занята другим процессом</span>')
+  }
+
+  if (data.reason == 'auth_key_unregistred') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Неверная сессия</span>')
+  }
+
+  if (data.reason == 'username_not_found') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Контакт не найден: ' + data.username + '</span>')
+
+  }
+
+  if (data.reason == 'error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Произошла ошибка: ' + data.message + '</span>')
+  }
+}
+
+  var STATUSES_CACHE = {};
+  var PHONES_TO_CHECK = null;
+  var DATA_TABLE = null;
+  var SELECTED_USERS = null;
+
+  $('#start_checker').click(function() {
+    if (typeof PHONES_TO_CHECK != "string") {
+      red_log('Вы не добавили ни одного телефонного номера для работы');
+      return;
+    }
+
+    if (SELECTED_USERS == null || SELECTED_USERS.length < 1) {
+      red_log('Для того, чтобы начать, необходимо выбрать как минимум один аккаунт');
+      return;
+    }
+
+    var checker_phones = PHONES_TO_CHECK.split('\n').filter(function (el) {
+      el = el.trim();
+      return el != null && el != '';
+    });
+
+    var len_phones = checker_phones.length
+    checker_phones = checker_phones.join('\n')
+
+    if (checker_phones.length == 0) {
+      red_log('Вы не добавили ни одного телефонного номера для работы');
+      return;
+    }
+
+    var check_sleep = $('#check_sleep').val();
+    var add_per_iteration = $('#add_per_iteration').val();
+    var max_flood_wait = $('#max_flood_wait').val();
+    var threads_count = $('#threads_count').val();
+    var phones_limit = $('#phones_limit').val();
+
+    var data = {
+        type: 'checker2_start',
+        data: {
+          check_sleep: check_sleep,
+          accounts: SELECTED_USERS,
+          contacts: checker_phones,
+          add_per_iteration: add_per_iteration,
+          max_flood_wait: max_flood_wait,
+          threads_count: threads_count,
+          phones_limit: phones_limit
+        }
+      }
+
+      $("#log").html('')
+
+      $('.contacts_count').val(0);
+      $('.contacts_count_all').val(0);
+      
+      DATA_TABLE.row().remove().draw(true);
+      $('.progress .bar').css('width', '0%');
+
+      log('Запускаем проверку телефонов');
+      log('')
+      log(`Будет проверено <b>${len_phones}</b> контактов`)
+
+      ws_send(data);
+  });
+
+  $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+  function ws_update_progress_checker(data) {
+    var checker_phones = PHONES_TO_CHECK.split('\n').filter(function (el) {
+      el = el.trim();
+      return el != null && el != '';
+    });
+
+    var len_phones = checker_phones.length
+
+    var checked = len_phones - data.how;
+    var percent = checked * 100 / len_phones;
+    $('.progress .bar').css('width', percent + '%');
+
+    $('.progress .numbers').html(`${checked}/${len_phones}`);
+  }
+  function status_get_more(status) {
+    var [stype, smore] = status.split(':');
+    return smore;
+  }
+  function status_get_type(status) {
+    var [stype, smore] = status.split(':');
+    return stype;
+  }
+  function status_to_string(status) {
+    var result = `?`;
+    var [stype, smore] = status.split(':');
+
+    if (stype == 'unknown') {
+      if (smore == 'LongTime') smore = 'Не заходил давно';
+      if (smore == 'OnlineNow') smore = 'Онлайн сейчас';
+      if (smore == 'LastMonth') smore = 'Был в этом месяце';
+      if (smore == 'LastWeek') smore = 'Был на этой неделе';
+      if (smore == 'Recently') smore = 'Заходил недавно';
+      result = smore;
+    } else {
+      smore = parseInt(smore);
+      var hd = 'часов';
+      if (smore >= 24) {
+        smore = Math.round(smore/24);
+        hd = num2str(smore, ['день', 'дня', 'дней']);
+      } else {
+        hd = num2str(smore, ['час', 'часа', 'часов']);
+      }
+      result = `${smore} ${hd} назад`;
+      if (smore == 0) {
+        result = `Заходил недавно`;
+      }
+    }
+    return result;
+  }
+
+  function num2str(n, text_forms) {  
+      n = Math.abs(n) % 100; var n1 = n % 10;
+      if (n > 10 && n < 20) { return text_forms[2]; }
+      if (n1 > 1 && n1 < 5) { return text_forms[1]; }
+      if (n1 == 1) { return text_forms[0]; }
+      return text_forms[2];
+  }
+
+  function checker2_end() {
+    $('.progress .bar').css('width', '0%');
+  }
+
+  function ws_concact_found(data) {
+    var username = '<span class="label label-warning">нет</span>';
+    
+    if (data.username.length > 0) {
+      username = '@' + data.username;
+    }
+
+
+    STATUSES_CACHE[data._id] = [data.phone, data.username, data.name, data.status];
+    var _status = status_to_string(data.status);
+
+    DATA_TABLE.row.add([
+        data.phone,
+        data._id,
+        username,
+        data.name,
+        _status
+    ]).draw( true );
+
+    $('.contacts_count').val(count_export_lines());
+    $('.contacts_count_all').val(Object.keys(STATUSES_CACHE).length);
+  }
+
+  $(document).ready( function () {
+
+    DATA_TABLE = $('#table_id').DataTable({
+      language: {
+        "decimal":        "",
+        "emptyTable":     "Нет данных",
+        "info":           "Показано от _START_ до _END_ (всего _TOTAL_ контактов)",
+        "infoEmpty":      "Нет данных",
+        "infoFiltered":   "(фильтрация _MAX_ контактов)",
+        "infoPostFix":    "",
+        "thousands":      ",",
+        "lengthMenu":     "Отображать по _MENU_ контактов",
+        "loadingRecords": "Загрузка...",
+        "processing":     "Обработка...",
+        "search":         "Поиск:",
+        "zeroRecords":    "Нет подходящих результатов",
+        "paginate": {
+            "first":      "Первый",
+            "last":       "Последний",
+            "next":       "Следующий",
+            "previous":   "Предыдущий"
+        }
+      }, buttons: ['copy', 'excel', 'pdf']
+    });
+
+  });
+
+  function open_input_modal(_id) {
+    $('#' + _id).addClass('open');
+    return new Promise((resolve, reject) => {
+      $('#' + _id  + ' button').click(function() {
+        var txt = $(this).attr('input')
+        close_modal(_id)
+        resolve($(txt).val())
+      })
+      $('#' + _id  + ' .btn-close').click(function() {
+        close_modal(_id)
+        resolve(null)
+      })
+    })  
+  }
+
+  function close_modal(_id) {
+    $('#' + _id).removeClass('open');
+  }
+
+  $('.added_contacts_i').on('click', function() {
+    open_input_modal('modal_choose_phones').then(function(phones) {
+      if (phones == null) {
+        return
+      }
+
+      var checker_phones = phones.split('\n').filter(function (el) {
+        el = el.trim();
+        return el != null && el != '';
+      });
+
+      var how_much = checker_phones.length
+
+      $('#added_contacts').html(how_much);
+      log(`Добавлено <b>${how_much}</b> телефонных номеров`);
+
+      PHONES_TO_CHECK = phones;
+    })
+  })
+
+  loading_start()
+  var accounts_info = {}
+
+  $(document).ready(function() {
+
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop()
+        ws_send({type: 'get_accounts'});
+        ws_send({type: 'full_account_info'});
+    };
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data);
+      var f_data = data.data;
+      ws_defs(evt);
+
+      if (data.type == 'full_account_info') set_data_for_fast_choose(f_data);
+      if (data.type == 'concact_found') ws_concact_found(f_data);
+      if (data.type == 'checker2_end') checker2_end(f_data);
+      if (data.type == 'error') ws_error(f_data)
+      if (data.type == 'update_progress_checker') ws_update_progress_checker(f_data);
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+  $('.select_users_i').click(function() {
+    open_account_chooser().then(function(users) {
+      SELECTED_USERS = users;
+      $('#selected_users').html(SELECTED_USERS.length);
+      if (SELECTED_USERS.length > 0) {
+        log(`Выбрано <b>${SELECTED_USERS.length}</b> сессий</b>`)
+      }
+    })
+  });
+
+  var account_fast_list = {}
+  function open_account_chooser() {
+    $('.account_chooser').css({display: 'flex'})
+
+    return new Promise((resolve, reject) => {
+      $('.account_chooser .btn-fast-success').off('click')
+      $('.account_chooser .btn-fast-success').click(function() {
+        let accs = getActiveAccounts()
+        console.log(accs)
+        close_account_chooser()
+        resolve(accs)
+      })
+      $('.account_chooser .btn-close-modal').off('click')
+      $('.account_chooser .btn-close-modal').click(function(e) {
+        e.preventDefault()
+        close_account_chooser()
+        resolve([])
+      })
+    })
+  }
+  function close_account_chooser() {
+    unsetActives()
+    $('.account_chooser').css({display: 'none'})
+  }
+  function getActiveAccounts() {
+    var result = []
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      var acc = $(sels[i])
+      if (acc.hasClass('active')) {
+        result.push(acc.attr('phone'))
+      }
+    }
+    return result;
+  }
+  $('.btn-close-modal').click(function(e) {
+    e.preventDefault()
+    close_account_chooser()
+  })
+  function unsetActives() {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      $(sels[i]).removeClass('active')
+    }
+    $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+    $('.sliderRangeAccountsCheck').removeClass('opacity03')
+  }
+
+  function selectByIndex(x, y) {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      if (i+1 >= x && i+1 <= y) {
+        $(sels[i]).addClass('active')
+      } else {
+        $(sels[i]).removeClass('active')
+      }
+    }
+  }
+
+  function set_data_for_fast_choose(data) {
+    var table = ''
+    account_fast_list = data
+
+    $('.account_chooser .box-header .how').html(account_fast_list.length)
+
+    for (var account in data.account_list) {
+        var ac_info = data.account_list[account]
+        var number = account
+
+        var avatar = './img/default.png'
+        if (ac_info.avatar != 'default') {
+          if (ac_info.avatar != null) {
+            avatar = ac_info.avatar
+            avatar = avatar.replace('static/', '')
+          }
+        }
+
+        var username = '<span class="cline">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var phone = ac_info.phone
+        var lives = ac_info.lives
+
+        var cl_lives = 'green'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        table += `<tr phone="${phone}">`
+        table += `<td class="active_row"><i class="icon-ok"></i></td>`
+        table += `<td class="avatar center"><img src="${avatar}" onerror="this.src = './img/default.png'"/></td>`
+        table += `<td class='username'>${username}</td>`
+        table += `<td class='name'>${name}</td>`
+        table += `<td class="phone center">${phone}</td>`
+        table += `<td class="lives center"><span class="${cl_lives}">${lives}</span></td>`
+        table += `</tr>`
+      }
+
+
+      $('#accounts_list_fast').append(table)
+
+      $( ".sliderRangeAccountsCheck" ).slider({
+        range: true,
+        min: 1,
+        max: account_fast_list.length,
+        values: [1, account_fast_list.length],
+        slide: function( event, ui ) {
+          $( ".sliderRangeLabel" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ]);
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          selectByIndex(ui.values[0], ui.values[1])
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          }
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      });
+
+      $('.chose_all').click(function() {
+        if ($(this).hasClass('choseed_all') == false) {
+          var sels = $('#accounts_list_fast tr')
+          for (var i = 0; i < sels.length; i++) {
+            $(sels[i]).addClass('active')
+          }
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+            $('.sliderRangeAccountsCheck').addClass('opacity03')
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+            $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          }
+
+          $(this).addClass('choseed_all')
+          $(this).html('снять выбор')
+        } else {
+          unsetActives()
+          $(this).removeClass('choseed_all')
+          $(this).html('выбрать все')
+        }
+      })
+
+      $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+
+      $('#accounts_list_fast tr').click(function() {
+        if ($(this).hasClass('active') == false) {
+          $(this).addClass('active')
+        } else {
+          $(this).removeClass('active')
+        }
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      })
+  }
+</script>

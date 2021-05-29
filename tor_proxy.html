@@ -1,0 +1,227 @@
+<style>
+  .proxy_icons span {
+    margin-top: 5px;
+    margin-right: 2px;
+  }
+  .proxy_list {
+    border: 1px solid #bdbdbd;
+    display: inline-block;
+    padding: 5px 20px 5px 10px;
+    background: #fdfdfd;
+    height: 150px;
+    overflow-y: scroll;
+    width: 219px;
+    box-sizing: border-box;
+    vertical-align: middle;
+  }
+  .proxy_list p {
+    margin: 0;
+  }
+</style>
+<div class="row-fluid">
+  <div class="box span8">
+    <div class="box-header" data-original-title="">
+      <h2>Tor-прокси</h2>
+    </div>
+
+    <div class="box-content">
+      <form class="form-horizontal" style="margin: 0;">
+
+        <div class="alert alert-success">
+          Tor-прокси позволяет запустить локальный сервер, через который можно работать с Telegram. Запустив небходимое количество потоков, вы можете использовать их как обычные IPv4 Socks5 прокси
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span style="padding-right: 4px;">Запущенные прокси</span><span id='runned_num'>(0)</span></label>
+          <div class="controls proxy_icons">
+             <img src="img/spinner-mini.gif" alt="">
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>IPv4 / Socks 5 прокси</span></label>
+          <div class="controls">
+             <div id='proxy_copy' class="proxy_list"></div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Количество потоков</span></label>
+          <div class="controls">
+             <input id="how" value="5" type="number" min="1" step="1"></i> </span>
+          </div>
+        </div>
+
+        <div class="control-group" style="margin-bottom: 40px;">
+          <label class="settings-label"><span>Запускать автоматически</span></label>
+          <div class="controls">
+             <select id='start_tor_auto' style="display: none;">
+              <option value='yes'>Да</option>
+              <option value='no'>Нет</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="run_tor" class="btn btn-primary">Запустить Tor</button>
+        <button id="change_ip" class="btn btn-warning">Сменить IP</button>
+        <button id="close_tor" class="btn btn-danger">Закрыть все Tor-процессы</button>
+      </form>
+    </div>   
+  </div>
+</div>
+
+<style>
+  .radio {
+    padding: 0;
+    vertical-align: middle;
+  }
+</style>
+<script>
+$("input:checkbox, input:radio, input:file").uniform();
+$('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+  $('#start_tor_auto').on('change', function() {
+    var auto_start = false;
+    if ($('#start_tor_auto').val() == 'yes') {
+      auto_start = true;
+    }
+    var threads = $('#how').val();
+
+    ws_send({type: 'ws_autostart_tor', data: {
+      threads: threads,
+      auto_start: auto_start
+    }});
+
+    green_log('Сохранено');
+  });
+
+  $('#how').change(function () {
+    var auto_start = false;
+    if ($('#start_tor_auto').val() == 'yes') {
+      auto_start = true;
+    }
+    var threads = $('#how').val();
+
+    ws_send({type: 'ws_autostart_tor', data: {
+      threads: threads,
+      auto_start: auto_start
+    }});
+
+    green_log('Сохранено');
+  })
+
+$('.proxy_list').click(function() {
+  window.getSelection().selectAllChildren(
+      document.getElementById('proxy_copy')
+  );
+})
+
+$('#run_tor').click(function(e) {
+  e.preventDefault()
+  $('.proxy_icons').html('<img src="img/spinner-mini.gif" alt="">');
+  $('.proxy_list').html('');
+  ws_send({type: 'ws_create_controllers', data: {
+    ports: $('#how').val()
+  }});
+})
+
+$('#change_ip').click(function(e) {
+  e.preventDefault();
+  ws_send({type: 'ws_set_new_ip'});
+  loading_start();
+})
+
+$('#close_tor').click(function(e) {
+  e.preventDefault();
+  ws_send({type: 'ws_close_tor'});
+})
+
+function tor_opened_port(data) {
+  $('.proxy_icons img').remove();
+  $('.proxy_icons').append(`<span class="label label-info">${data.port}</span>`);
+  $('#runned_num').html(`<img src="img/spinner-mini.gif" alt="">`)
+  $('.proxy_list').append(`<p>socks5:127.0.0.1:${data.port}</p>`)
+}
+function set_new_ip_end() {
+  loading_stop();
+  green_log('Прокси перезапущены');
+}
+function tor_opened_port_end(data) {
+  $('#runned_num').html(`(${data.ports.length})`);
+  green_log('Tor-прокси запущены');
+}
+function ws_close_tor_end(data) {
+  location.reload();
+}
+
+function tor_active_ports_cb(data) {
+  let tors = data.ports
+  
+  $('#runned_num').html(`(${tors.length})`)
+  $('.proxy_icons').html('');
+
+  for (let port of tors) {
+    $('.proxy_icons').append(`<span class="label label-info">${port}</span>`);
+    if ($('.proxy_icons span').length > 7) {
+      $('.proxy_icons').append(`<span class="label label-info">...</span>`);
+      break;
+    }
+  }
+
+  $('.proxy_list').html('');
+  for (let port of tors) {
+    $('.proxy_list').append(`<p>socks5:127.0.0.1:${port}</p>`)
+  }
+
+  if (tors.length == 0) {
+    $('.proxy_icons').html('<span class="label label-inverse">нет запущенных прокси</span>')
+  }
+}
+
+function ws_get_is_need_activate_tor_cb(data) {
+  if (data.need) {
+    $("#start_tor_auto").val('yes');
+  } else {
+    $("#start_tor_auto").val('no');
+  }
+  $("#start_tor_auto").show();
+
+  $('#how').val(data.thrs)
+}
+
+$(document).ready(function() {
+  WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+  
+  WS.onopen = function() {
+    loading_stop();
+    ws_send({type: 'get_accounts'});
+    ws_send({type: 'get_is_need_activate_tor'});
+    ws_send({type: 'get_active_tor'});
+  };
+
+  WS.onclose = function(event) {
+    loading_start()
+    red_log('Соединение с сервером потеряно');
+  };
+
+  WS.onmessage = function (evt) {
+    var data = JSON.parse(evt.data)
+    var f_data = data.data
+
+     ws_defs(evt);
+
+    if (data.type == 'tor_active_ports_cb') tor_active_ports_cb(f_data)
+    if (data.type == 'ws_close_tor_end') ws_close_tor_end(f_data)
+    if (data.type == 'tor_opened_port_end') tor_opened_port_end(f_data)
+    if (data.type == 'set_new_ip_end') set_new_ip_end(f_data)
+    if (data.type == 'ws_get_is_need_activate_tor_cb') ws_get_is_need_activate_tor_cb(f_data)
+    if (data.type == 'tor_opened_port') tor_opened_port(f_data)
+    
+  };
+})
+
+window.onbeforeunload = function() {
+  WS.onclose = function () {};
+  WS.close();
+};
+</script>

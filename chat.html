@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+
+    <link href="css/bootstrap.min30.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link href="css/toastify.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/jquery.contextMenu.min.css">
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery.contextMenu.min.js"></script>
+    <script src="js/jquery.ui.position.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/toastify.js"></script>
+    <script src="js/reconnecting-websocket.min.js"></script>
+</head>
+<body>
+    
+<div class="main">
+<div class="container-fluid app">
+  <div class="row settings">
+    <div class="col-xs-12 colored">
+    
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" id="show_chats" value="show_chats" checked=""> Чаты
+    </label>
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" id="show_channels" value="show_channels"> Каналы
+    </label>
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" id="show_users" value="show_users" checked=""> Пользователи
+    </label>
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" id="show_bots" value="show_bots"> Боты
+    </label>
+    
+    <span class='vertical_hr'></span>
+
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" id="load_media" value="load_media" checked=""> Загружать медиа
+    </label>
+
+    </div>
+  </div>
+  <div class="row app-one">
+
+  	<div class="col-xs-3 side">
+      <div class="side-one">
+        <div class="row heading colored">
+            <div class="col-xs-10 heading-name">
+              <a class="heading-name-meta colored">Ваши боты</a>
+            </div>
+        </div>
+
+        <div class="row sideBar bots_pick">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xs-4 conversation">
+      <div class="side-one">
+        <div class="row heading colored">
+            <div class="col-xs-2 heading-avatar">
+              <div class="heading-avatar-icon">
+                <span class="user you"><span>You</span></span>
+              </div>
+            </div>
+            <div class="col-xs-10 heading-name">
+              <a class="heading-name-meta user_name colored"></a>
+            </div>
+        </div>
+
+        <div class="row sideBar dialogs_pick">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xs-5 conversation">
+      <div class="row heading colored">
+        <div class="col-xs-8 heading-name">
+          <a class="heading-name-meta chat_name colored" from_id="0">Диалог не выбран</a>
+        </div>
+      </div>
+
+      <div class="row message" id="conversation">
+        <div class="spacer"></div>
+        <div class="messages">
+        
+        </div>
+      </div>
+
+      <div class="row reply">
+
+        <div class="col-xs-11 reply-main">
+          <textarea class="form-control" rows="1" id="send_message"></textarea>
+        </div>
+        <div class="col-xs-1 reply-send">
+          <img class='wait_send_msg' src="./img/load.gif"></img>
+          <i class="fa fa-send fa-2x icon_send_msg" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="split_bar"></div>
+  
+
+  <div class="row app-two">
+    <div class="col-xs-12">
+      <div class="card">
+        <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Автоматический ответ</h3>
+        <div class="card-body">
+          <div id="autoreply_table" class="table-editable">
+            <table class="table table-bordered table-responsive-md table-striped text-center">
+              <thead>
+                <tr>
+                  <th class="text-center">Правило</th>
+                  <th class="text-center">Ответ</th>
+                  <th class="text-center">Добавить еще</th>
+                </tr>
+              </thead>
+              <tbody>              
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="vertical_move">
+  
+</div>
+<div class="container-fluid helper">
+  <div class="colored head ">Быстрый ответ</div>
+    <div class="li_viewer">
+      <ul>
+      </ul>
+    </div>
+    <textarea class="form-control add_new_helper" placeholder="Добавить" rows="1"></textarea>
+    <i class="fa fa-plus add_helper_button" aria-hidden="true"></i>
+</div>
+
+
+</div>
+
+<script>
+  function save_all_helpers() {
+    let result = '';
+    let lis = $('.li_viewer li');
+    for (let i of lis) {
+      result += $(i).html().trim() + '###';
+    }
+
+    localStorage.setItem('helper', result);
+  }
+
+  function restore_all_helpers() {
+    let helper_text = localStorage.getItem('helper');
+    if (helper_text == null) {
+      helper_text = '';
+    }
+    for (let child of helper_text.split('###')) {
+      if (child.trim() != '') {
+        $('.li_viewer ul').append(`<li>${child.trim()}</li>`);
+      }
+    }
+  }
+
+  $(document).ready(function() {
+    restore_all_helpers();
+
+    if ($('.li_viewer li').length == 0) {
+      $('.li_viewer ul').append(`<li>Привет</li>`);
+    }
+
+    $('.add_helper_button').click(function() {
+      $('.li_viewer ul').append(`<li>${$('.add_new_helper').val()}</li>`);
+      save_all_helpers();
+    });
+
+    $('.li_viewer').contextMenu({
+        selector: 'li',
+        callback: function(key, options) {
+            if (key == "delete") {
+              $(this).remove();
+              save_all_helpers();
+            }
+        },
+        items: {
+            "delete": {name: "Удалить"}
+        }
+    });
+
+    const bar = document.querySelector('.split_bar');
+    const top = document.querySelector('.app-one');
+    let mouse_is_down = false;
+
+    bar.addEventListener('mousedown', (e) => {
+      mouse_is_down = true;
+      $('body').addClass('no_content_select');
+    })
+
+    document.addEventListener('mousemove', (e) => {
+      if (!mouse_is_down) return;
+      top.style.height = `${e.clientY-55}px`;
+    })
+
+    document.addEventListener('mouseup', () => {
+      mouse_is_down = false;
+      $('body').removeClass('no_content_select');
+    })
+
+
+
+    const vertical_move = document.querySelector('.vertical_move');
+    const app = document.querySelector('.app');
+    let Vmouse_is_down = false;
+
+    vertical_move.addEventListener('mousedown', (e) => {
+      Vmouse_is_down = true;
+      $('body').addClass('no_content_select');
+    })
+
+    document.addEventListener('mousemove', (e) => {
+      if (!Vmouse_is_down) return;
+      if (e.clientX > window.innerWidth - 250 || e.clientX < 780) {
+        return;
+      }
+      app.style.width = `${e.clientX}px`;
+    })
+
+    document.addEventListener('mouseup', () => {
+      Vmouse_is_down = false;
+      $('body').removeClass('no_content_select');
+    })
+
+
+  })
+  function serialize_rules() {
+    let s = $('#autoreply_table tbody tr');
+    let result = '';
+    for (let i of s) {
+      let rule = window.btoa(encodeURIComponent($(i).find('.rule').html()));
+      let answer = window.btoa(encodeURIComponent($(i).find('.answer').html()));
+      result += `${rule}%%%${answer}|||` 
+    }
+    localStorage.setItem('autoreply', result);
+    send_rules();
+  }
+
+  function send_rules() {
+    let s = $('#autoreply_table tbody tr');
+    let result = '';
+    for (let i of s) {
+      result += `${$(i).find('.rule').html()}!!!${$(i).find('.answer').html()}---`;
+    }
+    ws_send({'cmd': 'rules', 'data': {
+      'rules': result
+    }});
+  }
+
+  function deserialize_rules() {
+    let items = localStorage.getItem('autoreply');
+    if (items == null) {
+      items = '';
+    }
+    let childs = items.split('|||');
+    for (let child of childs) {
+      let [rule,answer] = child.split('%%%');
+      if (rule.trim().length == 0 || answer.trim().length == 0) {
+        continue;
+      }
+      rule = decodeURIComponent(window.atob(rule));
+      answer = decodeURIComponent(window.atob(answer));
+      let ht = `<tr>
+        <td class="pt-3-half rule" contenteditable="true">${rule}</td>
+        <td class="pt-3-half answer" contenteditable="true">${answer}</td>
+        <td>
+          <button type="button" id="table-add" class="btn btn-success btn-rounded btn-sm my-0">Клонировать</button>
+          <button type="button" id="table-remove" class="btn btn-danger btn-rounded btn-sm my-0">Удалить</button>
+        </td>
+      </tr>`;
+
+      $('#autoreply_table tbody').append(ht);
+    }
+  }
+
+  $(document).ready(function() {
+    deserialize_rules();
+
+    if ($('#autoreply_table tbody tr').length == 0) {
+      let ht = `<tr>
+        <td class="pt-3-half rule" contenteditable="true">*hi*</td>
+        <td class="pt-3-half answer" contenteditable="true">Привет</td>
+        <td>
+          <button type="button" id="table-add" class="btn btn-success btn-rounded btn-sm my-0">Клонировать</button>
+          <button type="button" id="table-remove" class="btn btn-danger btn-rounded btn-sm my-0">Удалить</button>
+        </td>
+      </tr>`;
+
+      $('#autoreply_table tbody').append(ht);
+    }
+
+    $('#autoreply_table tbody').on('input', 'tr', function() {
+      serialize_rules();
+    });
+  });
+
+  $('#autoreply_table').on('click', '#table-add', () => {
+   const $clone = $('#autoreply_table').find('tbody tr').last().clone(true).removeClass('hide table-line');
+    $('#autoreply_table').find('table').append($clone);
+    serialize_rules();
+ });
+
+  $('#autoreply_table').on('click', '#table-remove', function() {
+    if ($('#autoreply_table tbody tr').length == 1) {
+      let s = $(this).parent().parent();
+      s.find('.rule').html('');
+      s.find('.answer').html('');
+    } else {
+      $(this).parent().parent().remove();
+    }
+    serialize_rules();
+ });
+
+  $('.helper .li_viewer').on('click', 'li', function() {
+    $('#send_message').val($(this).html());
+  });
+
+function GetURLParameter(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}
+
+var WS = new ReconnectingWebSocket("ws://localhost:" + GetURLParameter('p') + "/websocket");
+var ID = '' + Math.random();
+ 
+$('.bots_pick').on('click', '.user_bot', function() {
+	$('.user_bot').removeClass('active');
+	$(this).addClass('active');
+	$('.user_name').html($('.user_bot.active').attr('dialog_name'));
+  var photo = $('.user_bot.active .avatar-icon').html();
+  $('.heading-avatar-icon').html(photo);
+	$('.dialogs_pick').html(`<div class="loader"><img src="./img/load.gif"></img></div>`)
+
+  $('.messages').html('');
+  $('.chat_name').html('Диалог не выбран');
+
+  var load_media = $('#load_media').is(':checked');
+
+	ws_send({'cmd': 'get_dialogs', 'data': {
+		'phone': $(this).attr('dialog_phone'),
+    'load_media': load_media
+	}});
+})
+
+$('#show_channels, #show_chats, #show_users, #show_bots').change(show_hide_types)
+
+function show_hide_types() {
+  var show_channels = $('#show_channels').is(':checked');
+  var show_chats = $('#show_chats').is(':checked');
+  var show_users = $('#show_users').is(':checked');
+  var show_bots = $('#show_bots').is(':checked');
+
+  if (!show_users) {
+    $('div[dialog_type="User"]').hide();
+  } else {
+    $('div[dialog_type="User"]').show();
+  }
+
+  if (!show_channels) {
+    $('div[dialog_type="Channel"]').hide();
+  } else {
+    $('div[dialog_type="Channel"]').show();
+  }
+
+  if (!show_chats) {
+    $('div[dialog_type="Group"]').hide();
+  } else {
+    $('div[dialog_type="Group"]').show();
+  }
+
+  if (!show_bots) {
+    $('div[dialog_type="Bot"]').hide();
+  } else {
+    $('div[dialog_type="Bot"]').show();
+  }
+}
+
+$('.reply-send').on('click', function() {
+  var message = $('#send_message').val();
+  var target_id = $('.dialog_messages.active').attr('dialog_id');
+  var account_phone = $('.user_bot.active').attr('dialog_phone');
+  
+  if (message.length < 1) {
+    return;
+  }
+
+  if (target_id == null) {
+    Toastify({
+      text: "Не выбран получатель сообщения"
+    }).showToast();
+    return;
+  }
+
+  if (account_phone == null) {
+    Toastify({
+      text: "Не выбран отправитель сообщения"
+    }).showToast();
+    return;
+  }
+
+  ws_send({'cmd': 'send_message', 'data': {
+    'message': message,
+    'target_id': target_id,
+    'account_phone': account_phone
+  }});
+
+  wait_sending();
+});
+
+function wait_sending() {
+  $('.wait_send_msg').show();
+  $('.icon_send_msg').hide();
+}
+function wait_sending_stop() {
+  $('.wait_send_msg').hide();
+  $('.icon_send_msg').show();
+}
+
+function update_counter(account_phone, from_id) {
+  let counter_span = $(`.user_bot[dialog_phone="${account_phone}"]`).find('.msgs_counter');
+  if (counter_span.html() != '') {
+    let idx = parseInt(counter_span.html());
+    counter_span.html(idx+1);
+  } else {
+    counter_span.html('1');
+  }
+ 
+  let counter_dialog_span = $(`.dialog_messages[dialog_id="${from_id}"]`).find('.msgs_counter');
+  if (counter_dialog_span.html() != '') {
+    let idx = parseInt(counter_dialog_span.html());
+    counter_dialog_span.html(idx+1);
+  } else {
+    counter_dialog_span.html('1');
+  }
+}
+
+WS.onopen = function() {
+    console.log('Open')
+    ws_send({'cmd': 'ping'})
+    send_rules();
+};
+
+WS.onclose = function(event) {
+  console.log('Close')
+};
+
+var unreads = {};
+
+function update_unreads(phone, dialog_id, how) {
+  if (Object.keys(unreads).indexOf(phone) == -1) {
+    unreads[phone] = {};
+    unreads[phone][dialog_id] = how;
+    draw_unreads();
+    return;
+  }
+
+  if (unreads[phone][dialog_id] == null)  {
+    unreads[phone][dialog_id] = how;
+    draw_unreads();
+    return;
+  }
+
+  if (how == 0) {
+    how = -unreads[phone][dialog_id];
+  }
+
+  unreads[phone][dialog_id] += how;
+  draw_unreads();
+}
+
+function draw_unreads() {
+  for (let phone of Object.keys(unreads)) {
+    let unreads_ln = unreads[phone];
+    let unreads_count = 0;
+
+    for (let idx of Object.keys(unreads_ln)) {
+      let spanx = $(`.dialog_messages[dialog_id="${idx}"]`).find('.msgs_counter');
+      unreads_count += unreads_ln[idx];
+      if (unreads_ln[idx] > 0) {
+        spanx.html(unreads_ln[idx]);
+      } else {
+        spanx.html('');
+      }
+    }
+
+    let counter_span = $(`.user_bot[dialog_phone="${phone}"]`).find('.msgs_counter');
+    if (unreads_count > 0) {
+      counter_span.html(unreads_count);
+    } else {
+      counter_span.html('');
+    }
+  }
+}
+
+WS.onmessage = function (evt) {
+    var data = JSON.parse(evt.data);
+    var f_data = data.data;
+
+    console.log('IN:')
+    console.log(data)
+
+    if (data.cmd == 'pong') {
+        ws_send({'cmd': 'add_accounts'})
+    }
+
+    if (data.cmd == 'new_message') {
+      let account_phone = f_data.phone;
+      let from_id = f_data.from_id;
+      let message = f_data.message;
+      let current_dlg_id = parseInt($('.chat_name').attr('from_id'));
+
+      if (current_dlg_id == from_id) {
+        msg_add(message);
+      } else {
+        update_unreads(account_phone, message.dialog_id, 1);
+      }
+
+      if ($('.user_bot.active').attr('dialog_phone') == account_phone) {
+        if ($(`.dialog[dialog_id="${from_id}"]`).length == 0) {
+          ws_send({'cmd': 'get_dialogs', 'data': {
+            'phone': account_phone,
+            'load_media': $('#load_media').is(':checked')
+          }});
+        }
+
+        $(`.dialog[dialog_id="${message.dialog_id}"] .name-msg`).html(message.message);
+      }
+
+      let toast_msg = message.message;
+      if (toast_msg.length > 25) {
+        toast_msg = toast_msg.substr(0, 25);
+      }
+      Toastify({text: `${f_data.bot_name}: ${toast_msg} (${message.from_name})`}).showToast();
+
+      setTimeout(function() {
+        $('#conversation')[0].scrollTop = $('#conversation')[0].scrollHeight;
+      }, 800)
+    }
+
+    if (data.cmd == 'accounts') {
+    	bots_clear();
+    	for (var phone in f_data) {
+    		var ln = f_data[phone];
+    		bot_add(ln.name, ln.phone, ln.color, ln.photo, ln.client);
+    	}
+    }
+    if (data.cmd == 'download_photo') {
+      $('.dialogs_pick').html(`<div class="loader"><img src="./img/load.gif"></img><div class="loading_progress">Загружаем аватар: ${f_data.name}</div></div>`);
+    }
+    if (data.cmd == 'download_media') {
+      $('.messages').html(`<div class="loader"><img src="./img/load.gif"></img><div class="loading_progress">Загружаем медиа: ${f_data.name}</div></div>`);
+    }
+    if (data.cmd == 'connected') {
+    	if (f_data.connected == false) {
+    		$(`.user_bot[dialog_phone="${f_data.phone}"]`).addClass('error');
+    		$(`.user_bot[dialog_phone="${f_data.phone}"]`).removeClass('active');
+    		$('.dialogs_pick').html("");
+        Toastify({
+          text: f_data.error, 
+          backgroundColor: 'linear-gradient(to right, rgb(232, 78, 78), rgb(201, 61, 67))'
+        }).showToast();
+    	} else {
+        set_connect_icon(f_data.phone, true);
+      }
+      if (f_data.photo != null) {
+        $(`.bots_pick div[dialog_phone="${f_data.phone}"] .avatar-icon`).html(`<img src="${f_data.photo}" style="height: 100%;width: auto;">`);
+      }
+    }
+
+    if (data.cmd == 'autoreply_sent') {
+      let from_id = f_data.from_id;
+      let current_dlg_id = parseInt($('.chat_name').attr('from_id'));
+      if (current_dlg_id == from_id) {
+        msg_add(f_data.message);
+      }
+      $('#conversation')[0].scrollTop = $('#conversation')[0].scrollHeight;
+      $(`.dialog[dialog_id="${f_data.message.dialog_id}"] .name-msg`).html(f_data.message.message);
+      update_unreads(f_data.phone, f_data.message.dialog_id, 0);
+      Toastify({text: `Автоответчик: ${f_data.message.message}`}).showToast();
+    }
+
+    if (data.cmd == 'log') {
+      Toastify({text: f_data.message}).showToast();
+    }
+
+    if (data.cmd == 'message_sended') {
+      wait_sending_stop();
+      $('#send_message').val('');
+
+      if (f_data.success) {
+        Toastify({text: "Сообщение отправлено"}).showToast();
+        msg_add({
+          date: new Date().getTime() / 1000,
+          dialog_id: f_data.dialog_id,
+          forward: false,
+          from_name: f_data.name,
+          message: f_data.message,
+          msg_file: null,
+          msg_type: "Text",
+          out: true
+        })
+        $('#conversation')[0].scrollTop = $('#conversation')[0].scrollHeight;
+      } else {
+        system_message('Сообщение не отправлено:\n' + f_data.error);
+        $('#conversation')[0].scrollTop = $('#conversation')[0].scrollHeight;
+      }
+    }
+
+    if (data.cmd == 'messages') {   
+        $('.messages').html('');
+        for (let msg of f_data.messages) {
+            msg_add(msg);
+        }
+        draw_unreads();
+        setTimeout(function() {
+          $('#conversation')[0].scrollTop = $('#conversation')[0].scrollHeight;
+        }, 800)
+    }
+
+    if (data.cmd == 'dialogs') {
+        $('.dialogs_pick').html('');
+        for (var dlg of f_data) {
+            console.log(dlg)
+
+            var profile_photo = `<span class="user roster color_${getRandomInt(1, 8)}"><span>${dlg.name.substring(0, 2)}</span></span>`;
+
+            if (dlg.photo != null) {
+              profile_photo = `<img src="${dlg.photo}" style="height: 100%;width: auto;border-radius: 30px;">`;
+            }
+
+
+            $('.dialogs_pick').append(`<div class="row sideBar-body dialog dialog_messages" dialog_id="${dlg.id}" dialog_name="${dlg.name || ''}" dialog_username="${dlg.username || ''}" dialog_type="${dlg.d_type_x}">
+            <div class="col-xs-2 sideBar-avatar">
+              ${profile_photo}
+            </div>
+            <div class="col-xs-10 sideBar-main">
+              <div class="row">
+                <div class="col-xs-8 sideBar-name">
+                  <span class="name-meta">${dlg.name}</span>
+                  <span class="name-msg">${dlg.out ? '<span class="out">→</span>' : ''} ${dlg.message != null && dlg.message.length > 0 ? dlg.message : '<b>[media]</b>'}</span>
+                </div>
+                <div class="col-xs-4 pull-right sideBar-time">
+                  <span class="time-meta pull-right">${format_time(dlg.date)}
+                  </span>
+                  <span class="name-type pull-right">${dlg.d_type}</span>
+                </div>
+              </div>
+            </div>
+            <span class='msgs_counter'></span>
+          </div>`)
+        }
+        show_hide_types();
+        draw_unreads();
+    }
+}
+
+
+function system_message(text) {
+  $('.messages').append(`<div class="row message-body msg">
+    <div class="col-xs-12 message-main-sender">
+      <div class="sender">
+        <div class='message-sender'>
+        <div class="message-text" style="color: red;">
+          ${text}
+        </div>
+      </div>
+    </div>
+  </div>`);
+}
+
+$('.dialogs_pick').on('click', '.dialog', function() {
+    $('.dialog_messages').removeClass('active');
+    $(this).addClass('active');
+    var name = $(this).attr('dialog_name') || '';
+    var username = $(this).attr('dialog_username');
+    if (username != 'null' && username != null && username.length > 0) {
+      username = `@${username} -`;
+    }
+    $('.messages').html(`<div class="loader"><img src="./img/load.gif"></img></div>`)
+    var id = $(this).attr('dialog_id');
+    $('.chat_name').html(`${username} ${name}`);
+    $('.chat_name').attr('from_id', parseInt(id));
+    var photo = $('.user_bot.active .avatar-icon').html();
+    $('.heading-avatar-icon').html(photo);
+    var load_media = $('#load_media').is(':checked');
+    var phone = $('.user_bot.active').attr('dialog_phone');
+    update_unreads(phone, parseInt(id), 0);
+    ws_send({'cmd': 'get_messages', 'data': {
+      'load_media': load_media,
+    	'id': parseInt(id),
+    	'phone': phone
+    }});
+    draw_unreads();
+})
+
+window.onbeforeunload = function() {
+  WS.onclose = function () {};
+  WS.close();
+};
+
+function bots_clear() {
+	$('.bots_pick').html('');
+}
+
+function bot_add(name, phone, color, photo, connected) {
+  var profile_photo = `<span class="user roster color_${color} small_user"><span>${name.substring(0, 2)}</span></span>`;
+  if (photo != null) {
+    profile_photo = `<img src="${photo}" style="height: 100%;width: auto;">`;
+  }
+
+	$('.bots_pick').append(`<div class="row sideBar-body dialog small_dialog user_bot" dialog_phone="${phone}" dialog_name="${name}">
+      <i class="fa fa-exclamation-triangle connect_error" aria-hidden="true" />
+	    <div class="col-xs-2 sideBar-avatar">
+	      <div class="avatar-icon">
+        ${profile_photo}
+	      </div>
+	    </div>
+	    <div class="col-xs-10 sideBar-main">
+	      <div class="row">
+	        <div class="col-xs-12 sideBar-name">
+	          <span class="name-meta">${name}</span>
+	        </div>
+	      </div>
+	    </div>
+      <span class='connected'>
+        <i class="fa fa-wifi con_yes" aria-hidden="true"></i>
+        <i class="con_no"></i>
+      </span>
+      <span class='msgs_counter'></span>
+	  </div>`);
+
+    set_connect_icon(phone, connected);
+}
+
+function set_connect_icon(phone, connected) {
+  let connected_span = $(`.user_bot[dialog_phone="${phone}"] .connected`);
+  if (connected) {
+    connected_span.find('.con_yes').show();
+    connected_span.find('.con_no').hide();
+  } else {
+    connected_span.find('.con_yes').hide();
+    connected_span.find('.con_no').show();
+  }
+}
+
+function msg_add(msg) {
+  var msg_file = '';
+  if (msg.msg_type == 'Photo') {
+    msg_file = `<img src="${msg.msg_file}" onerror="this.src = './img/noimg.jpg'"></img>`
+  }
+  if (msg.msg_type == 'Sticker') {
+    msg_file = `<img style="width:50%;" src="${msg.msg_file}"></img>`
+  }
+  if (msg.msg_type == 'Video') {
+    msg_file = `<video src="${msg.msg_file}" controls=""></video>`
+  }
+  if (msg.msg_type == 'Video') {
+    msg_file = `<video src="${msg.msg_file}" controls=""></video>`
+  }
+  if (msg.msg_type == 'Audio') {
+    msg_file = `<audio controls src="${msg.msg_file}"></audio>`
+  }
+  if (msg.msg_type == 'MediaDocument') {
+    msg.message = '<span style="color:#3228c5;color: #3228c5;border: 1px solid;border-radius: 12px;padding: 1px 9px;">файл не загружен</span>';
+  }
+
+  var forward = '';
+  if (msg.forward) {
+    forward = 'репост';
+  }
+
+  if (msg_file.length == 0 && (msg.message == null || msg.message.length == 0)) {
+    return;
+  }
+
+  $('.messages').append(`<div class="row message-body msg" dialog_id="${msg.dialog_id}">
+    <div class="col-xs-12 ${msg.out ? 'message-main-sender' : 'message-main-receiver'}">
+      <div class="${msg.out ? 'sender' : 'receiver'}">
+        <div class='message-sender'>
+          ${msg.from_name}
+        </div>
+        <div class='message-forward'>
+          ${forward}
+        </div>
+        <div class="message-photo">
+          ${msg_file}
+        </div>
+        <div class="message-text">
+          ${msg.message}
+        </div>
+        <span class="message-time pull-right">
+          ${format_time(msg.date)}
+        </span>
+      </div>
+    </div>
+  </div>`);
+}
+function format_time(unix) {
+    var options = {
+      timezone: 'UTC',
+      hour: 'numeric',
+      minute: 'numeric'
+    };
+
+    return new Date(unix * 1000).toLocaleString("ru", options);
+}
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function ws_send(data) {
+  if (typeof data['data'] == 'undefined') {
+    data['data'] = {}
+  }
+
+  data['id'] = ID
+  console.log('Send: ')
+  console.log(data)
+
+  WS.send(JSON.stringify(data))
+}
+
+</script>
+
+
+</body>
+</html>

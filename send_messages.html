@@ -1,0 +1,921 @@
+<link rel="stylesheet" href="css/jquery.contextMenu.min.css">
+<script src="js/jquery.contextMenu.min.js"></script>
+<script src="js/jquery.ui.position.min.js"></script>
+
+
+<div class="row-fluid">
+  <div class="box span12">
+    <div class="box-header">
+      <h2>Рассылка сообщений</h2>
+    </div>
+    <div class="box-content">
+      <form class="form-horizontal" style="margin: 0;">
+        <fieldset>      
+
+        <div class="control-group" id='editor'>
+          <label class="msgs-label">Сообщение</label>
+          <div class="controls">
+
+           <div class="message_container">
+            <div class="header_line" id='toolbar'>
+              <button class="btn btn-mini trans msg_bold" data-original-title="Жирный" data-rel="tooltip">
+                <i class="halflings-icon bold"></i>
+              </button>
+              <button class="btn btn-mini trans msg_italic"  data-original-title="Курсив" data-rel="tooltip">
+                <i class="halflings-icon italic"></i>
+              </button>
+              <button class="btn btn-mini trans msg_mono"  data-original-title="Моноширинный" data-rel="tooltip">
+                <i class="halflings-icon text-width"></i>
+              </button>
+              
+              <button class="btn btn-mini trans msg_url_add"  data-original-title="Добавить ссылку" data-rel="tooltip">
+                <i class="halflings-icon font"></i>
+              </button>
+
+              <span class="separator"></span>
+              
+              <button class="btn btn-mini trans msg_forward"  data-original-title="Репост из канала" data-rel="tooltip">
+                <i class="halflings-icon share-alt"></i>
+              </button>
+              <button class="btn btn-mini trans msg_insert_image" data-original-title="Прикрепить фото" data-rel="tooltip">
+                <i class="halflings-icon camera"></i>
+              </button>
+              
+              <button class="btn btn-mini trans msg_inline_query"  data-original-title="Inline Query (@postbot, т.д.)" data-rel="tooltip">
+                <i class="halflings-icon tasks"></i>
+              </button>
+              
+              <span class="separator"></span>
+            
+              <button class="btn btn-mini trans msg_spin"  data-original-title="Спинтакс (рандомизация)" data-rel="tooltip">
+                <i class="halflings-icon random"></i>
+              </button>
+
+              <button class="btn btn-mini trans cmd_extend"  data-original-title="Расширенные сообщения" data-rel="tooltip" >
+                !cmd
+              </button>
+              
+              <span class="separator"></span>
+
+              <button class="btn btn-mini trans msg_restore"  data-original-title="Восстановить последнее сообщение" data-rel="tooltip">
+                <i class="halflings-icon repeat"></i>
+              </button>
+              
+              <button class="btn btn-mini trans msg_clear"  data-original-title="Удалить сообщение" data-rel="tooltip">
+                <i class="halflings-icon trash"></i>
+              </button>
+            
+            </div>
+
+            <span id='message_type' type='text', value=''></span>
+            <span id='message_settings'></span>
+
+            <textarea id="message" rows="10" placeholder="Введите сообщение здесь" canuse='{},<>,<file:>,!cmd'></textarea>
+
+            <div class="overflow_cont">
+                <div class="center_content">
+                  <h2 id='ov_head'></h2>
+                  <button class='cancel_overflow_cont'>Отменить</button>
+                </div>
+            </div>
+          </div>
+
+          <div class="message_preview">
+            <div class="img_wrap">
+              <img src="/img/noimg.jpg" alt="" class='preview_img'>
+              <div class="cencel_img"><div class="text">Отменить</div></div>
+            </div>
+            <div class="preview_text preview_text_without_img">
+              <button class="btn btn-mini trans msg_redraw" style="float: right;"><i class="halflings-icon repeat"></i></button>
+
+              <div class="inner_msg"></div>
+              <div class="next">Предпросмотр сообщения</div>
+              <span class="message_preview_time">16:00</span>
+            </div>
+          </div>
+
+          </div>
+        </div> 
+      
+      <div class="control-group">
+        <label class="msgs-label">Получатели</label>
+        <div class="controls">
+          <div class="message_container">
+            <div class="header_line recv_line">
+              <span class="progress_sending">Контактов: <span class="progress_sending_to bl">0</span></span>
+              
+              <button class="btn btn-mini trans receivers_restore"  data-original-title="Восстановить последний вариант" data-rel="tooltip">
+                <i class="halflings-icon repeat"></i>
+              </button>
+
+              <div class="file-upload insert_from">
+                <label>
+                  <input type="file" name="file" id="uploade-file">
+                  <span>Вставить из файла</span>
+                </label>
+              </div>
+
+            </div>
+            <textarea id="receivers" rows="10" placeholder="Юзернеймы или номера телефонов, каждый с новой строки (после отправки сообщения контакт автоматически удаляется из списка)"></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="msgs-label"></label>
+          <div class="controls">
+            <button id="start" class="btn btn-primary">Запустить</button>
+            <button id="settings" class="btn btn-primary">Настройки</button>
+          </div>
+      </div>
+      
+        </fieldset>
+      </form>
+
+
+    </div>
+  </div>
+</div>
+
+<div class="row-fluid checker_content">   
+  <div class="box span12">
+    <div class="box-header" data-original-title="">
+      <h2>Статистика</h2>
+    </div>
+    <div class="box-content checker_content_box">
+     <table id="table_id" class="display">
+        <thead>
+            <tr>
+                <th>Получатель</th>
+                <th>Отправитель</th>
+                <th>Сообщение</th>
+                <th>Время получения</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row-fluid logs h100vh">
+  <div class="box span12">
+    <div class="box-header" data-original-title="">
+      <h2>Лог работы</h2>
+    </div>
+    <div class="box-content">
+      <div class="log-content h100vh h100p">  
+          <ul id="log">
+
+
+          </ul>
+      </div>
+    </div>
+  </div>
+</div> 
+
+
+<div class="modal-wrapper" id='modal_settings'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span10 offset1 center settings_inner">
+          <h2>Настройки рассылки</h2>
+          <div class="control-group">
+            <span class='slabel'>Задержка между сообщениями</span>
+            <input id="opt_delay_betwen_sending_from" type="number" value="2" min="1" style="width: 50px;">
+            <span> - </span>
+            <input id="opt_delay_betwen_sending" value="4" type="number" min="1" style="width: 50px;">
+            <span class="pl5">секунд</span>
+          </div>
+          <div class="control-group">
+            <span class='slabel'>Максимальное время ожидания</span>
+            <input id="opt_max_timeout" type="number" min="0">
+            <span class="pl5">секунд</span>
+          </div>
+          <div class="control-group">
+            <span class='slabel'>Количество сообщений с аккаунта</span>
+            <input id="opt_msgs_count" type="number" min="0">
+            <span class="pl5">сообщений</span>
+          </div>          
+          <div class="control-group">
+            <span class='slabel'>Предпросмотр ссылок</span>
+            <input id='link_preview_opt' type="checkbox" checked='true' value="link_preview_opt">
+            <span class="pl5"></span>
+          </div>
+          <div class="control-group">
+            <span class='slabel'>Использовать черный список</span>
+            <input id='use_blacklist_opt' type="checkbox" checked='true' value="use_blacklist_opt">
+            <span class="pl5"></span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="mb15"></div>
+
+      <div class="row-fluid">
+        <div class="span12 center">
+          <button>Принять</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-wrapper" id='modal_choose_url'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите текст и ссылку</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="Google" id='input_urlname'>
+          <input type="text" placeholder="https://google.com" id='input_url'>
+          <button>Вставить</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_inline_query'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите данные</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="@postbot" id='input_botname_query'>
+          <input type="text" placeholder="15c92394a15349" id='input_query'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_forward'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите ссылку на пост в канале</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="https://t.me/test_channel_for_forward/3" id='input_forward_url'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_insert_image'>
+  <div class="modal">
+    <div class="modal_content">
+      <a class="btn-close trigger" href="javascript:;"></a>
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите ссылку на изображение</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="https://i.imgur.com/E0dconc.jpg" id='input_image_url'>
+          <button>Принять</button>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<script>
+    // let selectors = $('[canuse]');
+    // for (let sel of selectors) {
+    //   let offset = $(sel).offset();
+    //   let attr = $(sel).attr('canuse');
+    //   let helptext = '';
+    //   for (let child of attr.split(',')) {
+    //     if (child == '{}') {
+    //       helptext += 'Можно использовать классический спинтакс {a|b}\n';
+    //     }
+    //     if (child == '<>') {
+    //       helptext += 'Можно использовать последовательный спинтакс <a|b>\n';
+    //     }
+    //     if (child == '<file:>') {
+    //       helptext += 'Можно использовать файловый спинтакс <file:filename.txt>\n';
+    //     }
+    //     if (child == '!cmd') {
+    //       helptext += 'Поддерживаеются расширенные команды !cmd\n';
+    //     }
+    //   }
+    //   let l = offset.left + $(sel).width() - 10;
+    //   let t = offset.top + $(sel).height() - 10;
+
+    //   $('body').append(`<div class="floating icon-question-sign" style="position:absolute;left:${l}px;top:${t}px;z-index:999;" data-original-title="${helptext}" data-rel="tooltip"></div>`);
+    // }
+
+    // $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+</script>
+
+
+<style>
+
+  .cmd_extend, .cmd_extend:hover, .cmd_extend:focus {
+    color: black;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  table.dataTable.display tbody td:last-child {
+      text-align: center;
+  }
+  #table_id tr th:last-child {
+    width: 200px;
+    text-align: center;
+  }
+  select[name=table_id_length] {
+    width: 100px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+.progress_send_msg li {
+  display: inline-block;
+  margin: 0 15px; 
+  border-bottom: none !important;
+  min-width: 226px;
+  width: 20%;
+  margin-bottom: 15px;
+}
+
+#log {
+  max-height: none !important;
+  min-height: 0 !important; 
+}
+select {
+    margin-top: 5px;
+  }
+  table.dataTable.no-footer {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 12px;
+  }
+  table.dataTable thead th {
+    border-bottom: 1px solid #ddd;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: none;
+  }
+  table.dataTable thead .sorting_asc {
+    text-align: left;
+  }
+  table.dataTable thead .sorting {
+    text-align: left;
+  }
+  .added_contacts_div {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-top: 5px;
+    font-size: 15px;
+  }
+  .added_contacts_i {
+    color: #472dd2;
+    font-size: 20px;
+    vertical-align: middle;
+    padding-left: 6px;
+    cursor: pointer;
+    line-height: 0;
+  }
+  #add_contacts_area {
+    width: 90%;
+    box-sizing: border-box;
+    height: 180px;
+  }
+</style>
+
+
+
+
+<div class="account_chooser">
+  <div class="accounts_chooser_content">
+    <div class="box">
+    <div class="box-header">
+      <h2>Выберите аккаунты для работы (всего доступно <span class="how">0</span> аккаунтов)</h2>
+      <div class="box-icon">
+        <a href="#" class="btn-close-modal">
+          <i class="halflings-icon white remove"></i>
+        </a>
+      </div>
+    </div>
+    <div class="box-content">
+      <div class="account_range">
+        <div class="slider sliderRangeAccountsCheck red"></div> <span class="chose_all">выбрать все</span>
+        <div class="field_notice">(<span class="must sliderRangeLabel" style="color:  black;"></span>)</div>
+      </div>
+
+      <div class="inner">
+        <table class="table table-striped table-bordered">
+          <thead class='accounts_list_head_fast'>
+            <tr>
+              <th></th>
+              <th>Аватар</th>
+              <th>Юзернейм</th>
+              <th>Имя</th>
+              <th>Телефон</th>
+              <th>Отлёжка</th>
+            </tr>
+          </thead>   
+          <tbody id='accounts_list_fast'></tbody>
+        </table> 
+      </div>
+      <span class="label label-success lnp btn-fast-success">Принять</span>
+    </div>
+  </div>
+</div>
+
+<script src='/js/message_editor.js'></script>
+
+<script>
+
+
+
+
+  $('.cmd_extend').click(function(e) {
+    e.preventDefault();
+  })
+  $('.message_container').contextMenu({
+        selector: '.cmd_extend',
+        trigger: 'left',
+        callback: function(key, options) {
+            if (key == "inline") {
+              $('#message').val('!cmd inline @postbot {15e635bae4dd01|15e635bc20dd8e}');
+            }
+
+            if (key == "image") {
+              $('#message').val('!cmd image url {https://site.com/image1.png|https://site.com/image2.png} text {Текст один|Текст два}');
+            }
+
+            if (key == "auto_repost") {
+              $('#message').val('!cmd auto_repost title Продвижение url https://t.me/mychannel/43');
+            }
+
+            if (key == "multi_repost") {
+              $('#message').val('!cmd multi_repost {https://t.me/mychannel/42|https://t.me/mychannel/43}');
+            }
+
+            if (key == "shedule") {
+              $('#message').val('!cmd shedule 16:45 image http://site.com/image1.png text {Привет|Здравствуй}');
+            }
+
+            if (key == "silent") {
+              $('#message').val('!cmd silent image http://site.com/image.png text {Привет|Здравствуй}');
+            }    
+        },
+        items: {
+            "inline": {name: "!cmd inline"},
+            "image": {name: "!cmd image"},
+            "auto_repost": {name: "!cmd auto_repost"},
+            "multi_repost": {name: "!cmd multi_repost"},
+            "shedule": {name: "!cmd shedule"},
+            "silent": {name: "!cmd silent"}
+        }
+    });
+
+
+
+
+
+
+
+  var DATA_TABLE = null;
+
+  DATA_TABLE = $('#table_id').DataTable({
+    language: {
+      "decimal":        "",
+      "emptyTable":     "Нет данных",
+      "info":           "Показано от _START_ до _END_ (всего _TOTAL_ сообщений)",
+      "infoEmpty":      "Нет данных",
+      "infoFiltered":   "(фильтрация _MAX_ сообщений)",
+      "infoPostFix":    "",
+      "thousands":      ",",
+      "lengthMenu":     "Отображать по _MENU_ сообщений",
+      "loadingRecords": "Загрузка...",
+      "processing":     "Обработка...",
+      "search":         "Поиск:",
+      "zeroRecords":    "Нет подходящих результатов",
+      "paginate": {
+          "first":      "Первый",
+          "last":       "Последний",
+          "next":       "Следующий",
+          "previous":   "Предыдущий"
+      }
+    }, buttons: ['copy', 'excel', 'pdf']
+  });
+
+  $('.msg_redraw').click(function(e) {
+    e.preventDefault()
+    redrawPreview()
+  })
+
+  function incoming_settings(data) {
+    for (let setting in data) {
+      let selector = $('option[value="' + setting + '"]') 
+      if (setting == 'default_timeout') {
+        $('#opt_max_timeout').val(data[setting])
+      }
+      $('#opt_msgs_count').val('35')
+    }
+    set_message_settings()
+  }
+
+  function set_message_settings() {
+    let opts = ['opt_max_timeout', 'opt_msgs_count', 'opt_delay_betwen_sending_from', 'opt_delay_betwen_sending']
+    for (let key of opts) {
+      $('#message_settings').attr(key, $(`#${key}`).val())
+    }
+    $('#message_settings').attr('link_preview_opt', $('#link_preview_opt').is(':checked'))
+     $('#message_settings').attr('use_blacklist_opt', $('#use_blacklist_opt').is(':checked'))
+    
+  }
+  function get_message_settings() {
+    let result = {}
+    let opts = ['opt_delay_betwen_sending_from', 'opt_delay_betwen_sending', 'opt_max_timeout', 'opt_msgs_count', 'link_preview_opt', 'use_blacklist_opt']
+    for (let key of opts) {
+      result[key] = $('#message_settings').attr(key)
+    }
+
+    return result
+  }
+  
+  $('#settings').click(function(e) {
+    e.preventDefault()
+    open_settings_modal('modal_settings').then(function(result) {
+      set_message_settings()
+    })
+  })
+  
+  var account_fast_list = {}
+  function open_account_chooser() {
+    $('.account_chooser').css({display: 'flex'})
+
+    return new Promise((resolve, reject) => {
+      $('.account_chooser .btn-fast-success').off('click')
+      $('.account_chooser .btn-fast-success').click(function() {
+        let accs = getActiveAccounts()
+        console.log(accs)
+        close_account_chooser()
+        resolve(accs)
+      })
+      $('.account_chooser .btn-close-modal').off('click')
+      $('.account_chooser .btn-close-modal').click(function(e) {
+        e.preventDefault()
+        close_account_chooser()
+        resolve([])
+      })
+    })
+  }
+  function close_account_chooser() {
+    unsetActives()
+    $('.account_chooser').css({display: 'none'})
+  }
+  function getActiveAccounts() {
+    var result = []
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      var acc = $(sels[i])
+      if (acc.hasClass('active')) {
+        result.push(acc.attr('phone'))
+      }
+    }
+    return result;
+  }
+  $('.btn-close-modal').click(function(e) {
+    e.preventDefault()
+    close_account_chooser()
+  })
+  function unsetActives() {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      $(sels[i]).removeClass('active')
+    }
+    $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+    $('.sliderRangeAccountsCheck').removeClass('opacity03')
+  }
+
+  function selectByIndex(x, y) {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      if (i+1 >= x && i+1 <= y) {
+        $(sels[i]).addClass('active')
+      } else {
+        $(sels[i]).removeClass('active')
+      }
+    }
+  }
+
+  function set_data_for_fast_choose(data) {
+    var table = ''
+    account_fast_list = data
+
+    $('.account_chooser .box-header .how').html(account_fast_list.length)
+
+    for (var account in data.account_list) {
+        var ac_info = data.account_list[account]
+        var number = account
+
+        var avatar = './img/default.png'
+        if (ac_info.avatar != 'default') {
+          if (ac_info.avatar != null) {
+            avatar = ac_info.avatar
+            avatar = avatar.replace('static/', '')
+          }
+        }
+
+        var username = '<span class="cline">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var phone = ac_info.phone
+        var lives = ac_info.lives
+
+        var cl_lives = 'green'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        table += `<tr phone="${phone}">`
+        table += `<td class="active_row"><i class="icon-ok"></i></td>`
+        table += `<td class="avatar center"><img src="${avatar}" onerror="this.src = './img/default.png'"/></td>`
+        table += `<td class='username'>${username}</td>`
+        table += `<td class='name'>${name}</td>`
+        table += `<td class="phone center">${phone}</td>`
+        table += `<td class="lives center"><span class="${cl_lives}">${lives}</span></td>`
+        table += `</tr>`
+      }
+
+
+      $('#accounts_list_fast').append(table)
+
+      $( ".sliderRangeAccountsCheck" ).slider({
+        range: true,
+        min: 1,
+        max: account_fast_list.length,
+        values: [1, account_fast_list.length],
+        slide: function( event, ui ) {
+          $( ".sliderRangeLabel" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ]);
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          selectByIndex(ui.values[0], ui.values[1])
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          }
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      });
+
+      $('.chose_all').click(function() {
+        if ($(this).hasClass('choseed_all') == false) {
+          var sels = $('#accounts_list_fast tr')
+          for (var i = 0; i < sels.length; i++) {
+            $(sels[i]).addClass('active')
+          }
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+            $('.sliderRangeAccountsCheck').addClass('opacity03')
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+            $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          }
+
+          $(this).addClass('choseed_all')
+          $(this).html('снять выбор')
+        } else {
+          unsetActives()
+          $(this).removeClass('choseed_all')
+          $(this).html('выбрать все')
+        }
+      })
+
+      $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+
+      $('#accounts_list_fast tr').click(function() {
+        if ($(this).hasClass('active') == false) {
+          $(this).addClass('active')
+        } else {
+          $(this).removeClass('active')
+        }
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      })
+  }
+</script>
+
+
+
+<script>
+$("input:checkbox, input:radio").uniform();
+$('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+var attach_usernames_file = ''
+var attach_file = ''
+
+
+var accounts_info = {}
+loading_start()
+
+$('#start').click(function(e) {
+    e.preventDefault()
+    $('#log').html('')
+    save_message_settings()
+    let options = get_options()
+    if (options.is_inline_query == false && options.is_repost == false && options.with_file == false && options.text.length < 2) {
+      $.gritter.add({
+        title: 'Запуск невозможен',
+        text: 'Вы пытаетесь отправить пустое сообщение',
+      });
+      return
+    }
+    if (options.receivers.length < 3) {
+      $.gritter.add({
+        title: 'Запуск невозможен',
+        text: 'Добавьте список получателей',
+      });
+      return
+    }
+    open_account_chooser().then(function(res) {
+      if (res.length < 1) {
+        $.gritter.add({
+          title: 'Запуск невозможен',
+          text: 'Выберите аккаунты для работы',
+        });
+        return
+      }
+      let options = get_options()
+      options['phones'] = res
+      DATA_TABLE.row().remove().draw(true)
+      console.log(options)
+
+      ws_send({type: 'bulk_sender', data: options});
+      
+      $('#start').addClass('disabledb')
+      $('#settings').addClass('disabledb')
+    })
+  })
+
+
+function remove_username(data) {
+  removeUsernameFromLog(data.username)
+}
+
+function msg_sended(data) {
+  let accname = `${data.name}: `
+  log(accname + `Сообщение ${data.number} отправлено ${data.username}`)
+  removeUsernameFromLog(data.username)
+
+  var date = new Date();
+
+  options = {
+    timezone: 'UTC',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  };
+
+  DATA_TABLE.row.add([
+      data.username,
+      `${data.phone} (${data.name})`,
+      data.send_text,
+      date.toLocaleString("ru", options)
+  ]).draw( true );
+}
+
+
+function ws_error(data) {
+  var phone = data.phone
+  if (data.reason == 'error_connect_to_account') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Ошибка подключения к аккаунту. Возможно аккаунт забанен</span>')
+  }
+
+  if (data.reason == 'need_wait') {
+    log(`${data.name}: <span class="warn_need_wait">Необходимо подождать ${data.seconds} секунд</span>`)
+  }
+  if (data.reason == 'user_restricted') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь ограничен, но не забанен</span>')
+  }
+
+  if (data.reason == 'user_deactivated') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Пользователь забанен</span>')
+  }
+
+  if (data.reason == 'operational_error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Сессия занята другим процессом</span>')
+  }
+
+  if (data.reason == 'auth_key_unregistred') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Неверная сессия</span>')
+  }
+
+  if (data.reason == 'username_not_found') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Контакт не найден: ' + data.username + '</span>')
+
+  }
+
+  if (data.reason == 'error') {
+    let accname = `${data.name}: `
+    log(accname + '<span class="warn">Произошла ошибка: ' + data.message + '</span>')
+  }
+}
+
+function spam_end(data) {
+  log('')
+  let all = 0
+  for (let phone in data.sended) {
+    all += data.sended[phone]['sended']
+    log(`Аккаунт <span class="account_name">${data.sended[phone]['name']}</span> отправил <span class="snd_count">${data.sended[phone]['sended']}</span> сообщений`)
+  }
+  log(`Всего отправлено: <span class="snd_count">${all}</span>`)
+  log(`<span class="account_name">Рассылка заняла ${data.time}</span>`)
+
+  log('')
+  log(`<span class="log_success">Рассылка сообщений завершена</span>`)
+  
+  $('#start').removeClass('disabledb')
+  $('#settings').removeClass('disabledb')
+}
+
+$(document).ready(function() {
+  WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+  
+  WS.onopen = function() {
+      loading_stop()
+      ws_send({type: 'get_accounts'});
+      ws_send({type: 'full_account_info'});
+      ws_send({type: 'get_settings'});
+  };
+
+  WS.onclose = function(event) {
+    loading_start()
+    red_log('Соединение с сервером потеряно');
+  };
+
+  WS.onmessage = function (evt) {
+    var data = JSON.parse(evt.data)
+    var f_data = data.data
+
+    ws_defs(evt);
+
+    if (data.type == 'full_account_info') {
+      set_data_for_fast_choose(f_data)
+    }
+
+    if (data.type == 'msg_sended') msg_sended(f_data)
+    if (data.type == 'all_settings') incoming_settings(f_data)
+    if (data.type == 'spam_end') spam_end(f_data)
+    if (data.type == 'error') ws_error(f_data)
+    if (data.type == 'remove_username') remove_username(f_data)
+  };
+})
+
+window.onbeforeunload = function() {
+  WS.onclose = function () {};
+  WS.close();
+};
+
+</script>

@@ -1,0 +1,678 @@
+<div class="row-fluid account_register">
+	<div class="box" style="width: 70%;">
+		<div class="box-header" data-original-title>
+			<h2>Регистрация аккаунтов</h2>
+		</div>
+		<div class="box-content">
+			<div class="alert alert-success">
+            Данный раздел - для опытных пользователей. Мы рекомендуем приобретать уже готовые к работе аккаунты у проверенных продавцов.
+          	</div>
+
+			<div class="control-group">
+				<div class="head_settings">Основные</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Режим регистрации</span></label>
+				<div class="controls">
+					<select id='register_service'>
+				      <option value='none'>Ручной</option>
+					  <option value='simsms_api_key'>simsms.org</option>
+					  <option value='smsactivate_api_key'>sms-activate.ru</option>
+					  <option value='sms_online_api_key'>sms-online.pro</option>
+					  <option value='5sim_api_key'>5sim.net</option>
+					  <option value='cheapsms_api_key'>cheapsms.ru</option>
+					  <option value='sms_acktiwator_api_key'>sms-acktiwator.ru</option>
+					  <option value='smsvk_api_key'>smsvk.net</option>
+					  <option value='smska_api_key'>smska.net</option>
+					  <option value='sms_hub_api_key'>smshub.org</option>
+					  <option value='sms_kop_api_key'>sms.kopeechka.store</option>
+				    </select>
+				    <i id='print_balances' class="glyphicons-icon show_thumbnails" data-original-title="Вывести балансы СМС-сервисов" data-rel="tooltip"></i>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class='settings-label'><span>Количество аккаунтов</span></label>
+				<div class="controls accounts_count blur">
+					<input id='accounts_count' type="number" min="1" step="1" value='1'/>
+				</div>
+			</div>
+			<div class="control-group sms_services">
+				<div class="settings-label"><span>Страна для регистрации</span></div>
+				<div class="controls">
+				  <div class="inline_list blur">  <label class="radio">	<input type="radio" value="option1" checked="">	Россия  </label>  <label class="radio">	<input type="radio" value="option2">	Казахстан  </label>  <label class="radio">	<input type="radio" value="option2">	Украина  </label>  <label class="radio">	<input type="radio" value="option2">	Франция  </label>  <label class="radio">	<input type="radio" value="option2">	Кыргистан  </label>  <label class="radio">	<input type="radio" value="option2">	Конго  </label>  <label class="radio">	<input type="radio" value="option2">	Англия  </label> </div><div class="inline_list blur"><label class="radio">	<input type="radio" value="option1" checked="">	Россия</label><label class="radio">	<input type="radio" value="option2">	Казахстан</label><label class="radio">	<input type="radio" value="option2">	Украина</label><label class="radio">	<input type="radio" value="option2">	Франция</label><label class="radio">	<input type="radio" value="option2">	Кыргистан</label><label class="radio">	<input type="radio" value="option2">	Конго</label><label class="radio">	<input type="radio" value="option2">	Англия</label>
+				  </div>
+
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<div class="head_settings">Расширенные</div>
+			</div>
+			
+			<div class="control-group">
+				<label class='settings-label'><span>Игнорировать настройки</span></label>
+				<div class="controls">
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="ignore_settings" value="1" name="ignore_settings">
+							<span>Да</span>
+						</label>
+					</div>
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="ignore_settings" value="0" name="ignore_settings">
+							<span>Нет</span>
+						</label>
+					</div>
+					<i style="line-height: 32px;" class="icon-exclamation-sign" data-original-title="Если опция включена, установка аватаров, 2fa, новых имен и юзернеймов не будет произведена" data-rel="tooltip"></i>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Определенные имена</span></label>
+				<div class="controls">
+					<input id='fio' type="text" placeholder="{Иван Иванов|Николай}" />
+				</div>
+			</div>
+	
+			<div class="control-group">
+				<label class='settings-label'><span>Устанавливать bio</span></label>
+				<div class="controls">
+					<input id='bio' type="text" placeholder="{Я дизайнер из Москвы|Люблю нюхать цветы}" />
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Устанавливать аватары</span></label>
+				<div class="controls">
+					<select id='auto_set_avatars'>
+					  <option value='no'>Не устанавливать</option>
+					  <option value='default'>Стандартные</option>
+					  <option value='manual'>Собственные</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Устанавливать username</span></label>
+				<div class="controls">
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="generate_username" value="1" name="generate_username">
+							<span>Да</span>
+						</label>
+					</div>
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="generate_username" value="0" name="generate_username">
+							<span>Нет</span>
+						</label>
+					</div>
+
+				</div>
+			</div>
+	
+			<div class="control-group">
+				<label class='settings-label'><span>Устанавливать 2FA</span></label>
+				<div class="controls">
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="two_fa" value="1" name="two_fa">
+							<span>Да</span>
+						</label>
+					</div>
+					<div class="inline_list lh30 pr20">
+						<label class="radio vam">
+							<input type="radio" class="two_fa" value="0" name="two_fa">
+							<span>Нет</span>
+						</label>
+					</div>
+
+				</div>
+			</div>
+
+
+			
+			<div class="control-group">
+				<label class='settings-label'><span>Таймаут ожидания смс</span></label>
+				<div class="controls">
+					<span style="vertical-align: middle;font-size: 15px;line-height: 30px;">3 минуты</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+	            <button id="start_register" class="btn btn-large btn-success">Начать</button>
+	      	</div>
+
+		</div>
+	</div>
+
+
+	  <div class="box" style="width: 35%;margin-left: -2px;">
+	    <div class="box-header" data-original-title="">
+	      <h2>Вывод</h2>
+	    </div>
+	    <div class="box-content">
+	      <div class="log-content" style="max-height: none;">  
+	          <ul id="log"></ul>
+	      </div>
+	    </div>
+	  </div>
+
+
+</div>
+
+
+<div class="modal-wrapper" id='modal_insert_api'>
+  <div class="modal">
+    <div class="head">
+      <a class="btn-close trigger" href="javascript:;"></a>
+    </div>
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите API-ключ для <span class='key'></span></h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" id='input_name'>
+          <button input='#input_name'>Принять <div class="progress_button"></div></button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+	.w30 {
+		width: 30px !important;
+	}
+	.w160tl {
+	    width: 160px !important;
+		text-align: left !important;
+	}
+	.bottom_radio {
+		margin-bottom: 10px;
+	    border: 1px solid #d4d4d4;
+	    padding: 10px 0px;
+	    width: 90%;
+	    display: inline-block;
+	}
+	.fz16 {
+		font-size: 16px;
+	}
+</style>
+
+<div class="modal-wrapper" id='modal_manual_reg'>
+  <div class="modal">
+    <div class="head">
+      <a class="btn-close trigger" href="javascript:;"></a>
+    </div>
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите номер телефона</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" id='phone_val'>
+
+			<div class="bottom_radio">
+	          <label class="fz16"><span>Отсылать код</span></label>
+	            <div>
+	              <label class="radio w160tl">
+	                <input type="radio" class="w30 to_app" checked="checked" name="code_to">
+	                <span>В приложение</span>
+	              </label>
+	            </div>
+	            <div>
+	              <label class="radio w160tl">
+	                <input type="radio" class="w30 to_sms" name="code_to">
+	                <span>Через SMS</span>
+	              </label>
+	            </div>
+	        </div>
+
+			
+			<button input='#phone_val'>Принять <div class="progress_button"></div></button>
+
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_manual_reg_code'>
+  <div class="modal">
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Введите код из смс</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" id='code_val'>
+          <button input='#code_val'>Принять <div class="progress_button"></div></button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	$(document).keypress(function(e){
+		if (e.which == 13 && $('.modal-wrapper.open').length > 0) {
+		    $('.modal-wrapper button').click()
+		}
+	});
+	
+	$('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+	function init_manual_register() {
+		$('#modal_manual_reg .progress_button').css({display: 'none'});
+		open_phone_code_modal('modal_manual_reg').then(function(data) {
+			var key = data.phone;
+			var code_to = data.to_app;
+
+			if (key.trim().length > 0) {
+				send_init_manual_reg(key, code_to);
+			} else {
+				log('Регистрация отменена');
+			}
+			$('#modal_manual_reg .progress_button').css({display: 'inline-block'});
+			setTimeout(function() {
+				close_modal('modal_manual_reg');
+			}, 800)
+		})
+	}
+
+	function wait_code_manual_reg() {
+		let modal_id = 'modal_manual_reg_code';
+		$('#modal_manual_reg_code .progress_button').css({display: 'none'});
+		open_phone_code_modal(modal_id).then(function(data) {
+			var key = data.phone;
+			if (key.trim().length > 0) {
+				send_init_manual_reg_code(key)
+			} else {
+				ws_send({type: 'manual_reg_cancel'});
+				log('Регистрация отменена');
+			}
+			$('#modal_manual_reg_code .progress_button').css({display: 'inline-block'});
+			setTimeout(function() {
+				close_modal(modal_id);
+			}, 800)
+		})
+	}
+
+	function send_init_manual_reg(phone, code_to) {
+		let fio = $('#fio').val();
+	    let bio = $('#bio').val();
+	    let two_fa = $('input[class=two_fa]:checked').val() || '0';
+	    let generate_username = $('input[class=generate_username]:checked').val() || '0';
+	    let auto_set_avatars = $('#auto_set_avatars').val();
+	    let ignore_settings = $('input[class=ignore_settings]:checked').val() || '0';
+
+		ws_send({type: 'start_register', data: {
+			'service': 'none',
+			'phone': phone,
+			'fio': fio,
+			'bio': bio,
+			'two_fa': two_fa,
+			'generate_username': generate_username,
+			'auto_set_avatars': auto_set_avatars,
+			'to_app': code_to,
+			'ignore_settings': ignore_settings
+		}});
+	}
+
+	function send_init_manual_reg_code(code) {
+		let fio = $('#fio').val();
+	    let bio = $('#bio').val();
+	    let two_fa = $('input[class=two_fa]:checked').val() || '0';
+	    let generate_username = $('input[class=generate_username]:checked').val() || '0';
+	    let auto_set_avatars = $('#auto_set_avatars').val();
+	    let ignore_settings = $('input[class=ignore_settings]:checked').val() || '0';
+
+		ws_send({type: 'start_register_insert_code', data: {
+			'service': 'none',
+			'code': code,
+			'fio': fio,
+			'bio': bio,
+			'two_fa': two_fa,
+			'generate_username': generate_username,
+			'auto_set_avatars': auto_set_avatars,
+			'ignore_settings': ignore_settings
+		}});
+	}
+
+	var accounts_info = {}
+	loading_start()
+
+  $('#start_register').click(function() {
+  	let service = $('#register_service').val()
+    let country_id = $('input[class=sms_country]:checked').val()
+    let country_name = $('input[class=sms_country]:checked').parent().find('span').html()
+    
+    if (service == 'none') {
+		init_manual_register()
+		return;
+    }
+
+    if (country_name == null) {
+    	updateLog(`<span class="warning">Не выбрана страна для регистрации</span>`, 'startClick')
+    	return;
+    }
+    country_name = country_name.replace(/ \(.+?\)/, '');
+    let count = parseInt($('#accounts_count').val());
+    let fio = $('#fio').val();
+    let bio = $('#bio').val();
+    let two_fa = $('input[class=two_fa]:checked').val() || '0';
+    let generate_username = $('input[class=generate_username]:checked').val() || '0';
+    let ignore_settings = $('input[class=ignore_settings]:checked').val() || '0';
+
+    let auto_set_avatars = $('#auto_set_avatars').val();
+    let key = $(`option[value=${service}]`).attr('key');
+
+    if (key == null) {
+    	updateLog(`<span class="warning">Вы не указали API-ключ для сервиса sms-активаций</span>`, 'startClick')
+    	return
+    }
+    $('#start_register').addClass('btn_disable')
+
+    setTimeout(function() {
+    	$('#start_register').removeClass('btn_disable')
+    });
+
+    ws_send({type: 'start_register', data: {
+		'service': service,
+		'country_id': country_id,
+		'country_name': country_name,
+		'count': count,
+		'fio': fio,
+		'bio': bio,
+		'two_fa': two_fa,
+		'generate_username': generate_username,
+		'auto_set_avatars': auto_set_avatars,
+		'api_key': key,
+		'to_app': false,
+		'ignore_settings': ignore_settings
+	}});
+
+
+  })
+
+
+
+$('#print_balances').click(function() {
+	let options = $('#register_service option')
+	for (let opt of options) {
+		let key = $(opt).attr('key');
+		let service = $(opt).attr('service')
+		if (typeof key == 'undefined' || typeof service == 'undefined') {
+			continue
+		}
+			
+		ws_send({type: 'check_balance', data: {
+			'service': service,
+			'api_key': key
+		}});
+	}
+})
+
+
+  $('#register_service').on('change', function() {
+  	let defaultCountries = `<div class="inline_list blur">  <label class="radio">	<input type="radio" value="option1" checked="">	Россия  </label>  <label class="radio">	<input type="radio" value="option2">	Казахстан  </label>  <label class="radio">	<input type="radio" value="option2">	Украина  </label>  <label class="radio">	<input type="radio" value="option2">	Франция  </label>  <label class="radio">	<input type="radio" value="option2">	Кыргистан  </label>  <label class="radio">	<input type="radio" value="option2">	Конго  </label>  <label class="radio">	<input type="radio" value="option2">	Англия  </label> </div><div class="inline_list blur"><label class="radio">	<input type="radio" value="option1" checked="">	Россия</label><label class="radio">	<input type="radio" value="option2">	Казахстан</label><label class="radio">	<input type="radio" value="option2">	Украина</label><label class="radio">	<input type="radio" value="option2">	Франция</label><label class="radio">	<input type="radio" value="option2">	Кыргистан</label><label class="radio">	<input type="radio" value="option2">	Конго</label><label class="radio">	<input type="radio" value="option2">Англия</label></div>`
+
+  	if (this.value == 'none') {
+  		$('.sms_services .controls').html(defaultCountries)
+  		$('.sms_services .inline_list').addClass('blur')
+  		$('.accounts_count').addClass('blur')
+  		$('input[class=ignore_settings][value=1]').attr('checked', 'checked')
+  	} else {
+  		$('.sms_services .inline_list').removeClass('blur')
+  		$('.accounts_count').removeClass('blur')
+  		
+  		$('.sms_services .controls').html(defaultCountries)
+
+  		let spinner = `<div class="spin_control"><div class="spin-wrapper"><div class="spinner"></div></div></div>`
+
+  		$('.sms_services .controls *').addClass('blur')
+  		$('.sms_services .controls').prepend(spinner)
+
+
+  		let key = $(this).find("option:selected" ).attr('key')
+  		if (key != null) {
+  			ws_send({type: 'check_balance', data: {
+				'service': this.value,
+				'api_key': key
+			}});
+  		} else {
+  			request_key_for_service(this.value)
+  		}
+
+  		if (key != null && key.length > 3) {
+  			ws_send({type: 'sms_get_countries', data: {
+				'service': this.value.replace('_api_key', ''),
+				'api_key': key
+			}});
+  		}
+  	}
+  })
+
+  function sms_countries(data) {
+  	let column = Math.floor(Object.keys(data.countries).length/2)
+  	let idx = 0
+
+  	let init_block = `<div class="inline_list">`
+  	let html = init_block
+  	for (let country in data.countries) {
+  		let txt = country
+  		if (data.price != null) txt += ` (${data.price[country]} руб)`
+  		let app = `<label class="radio"><input type="radio" class="sms_country" value="${data.countries[country]}" name="${data['service']}"><span>${txt}</span></label>`
+  		html += app
+  		if (idx+1 == column) html += `</div>` + init_block
+  		idx++
+  	}
+  	html += `</div>`
+
+	$('.sms_services .controls').html(html)
+
+	$('input[type=radio][class=sms_country]').change(on_check_country)
+  }
+
+  function on_check_country() {
+  	let code = this.value
+    let country = $(this).parent().find('span').html()
+    let service = $(this).attr('name') + '_api_key'
+    let key = $('option[value="' + service + '"]').attr('key')
+    let identifer = new Date().getTime()
+
+    add_log_animation(identifer)
+
+    ws_send({type: 'get_sms_count', data: {
+		'service': service,
+		'country': country,
+		'api_key': key,
+		'code': code,
+		'identifer': identifer
+	}});
+
+  }
+  function open_phone_code_modal(_id) {
+      $('#' + _id).addClass('open');
+      $('#' + _id).find('input').val('')
+
+      return new Promise((resolve, reject) => {
+        $('#' + _id  + ' button').click(function() {
+          var txt = $(this).attr('input')
+          var to_app =  $('#' + _id).find('input[name="code_to"]:checked').hasClass('to_app')
+          resolve({phone: $(txt).val(), to_app: to_app})
+        })
+        $('#' + _id  + ' .btn-close').click(function() {
+          close_modal(_id)
+          resolve(null)
+        })
+      })  
+    }
+
+
+    function open_input_modal(_id, key) {
+      $('#' + _id).addClass('open');
+      $('#' + _id).find('input').val('')
+      $('#' + _id).find('.key').html(key)
+      return new Promise((resolve, reject) => {
+        $('#' + _id  + ' button').click(function() {
+          var txt = $(this).attr('input')
+          resolve($(txt).val())
+        })
+        $('#' + _id  + ' .btn-close').click(function() {
+          close_modal(_id)
+          resolve(null)
+        })
+      })  
+    }
+
+    function close_modal(_id) {
+      $('#' + _id).removeClass('open');
+    }
+
+	function request_key_for_service(service) {
+		let modal_id = 'modal_insert_api'
+		let name = $('option[value="'+service+'"]').html()
+		open_input_modal(modal_id, name).then(function(key) {
+			ws_send({type: 'pre_add_key', data: {
+				'service': service,
+				'api_key': key
+			}});
+			$('#modal_insert_api .progress_button').css({display: 'inline-block'});
+		})
+	}
+
+	function pre_add_key_check_balance(data) {
+		let service = data['service']
+	  	let modal_id = 'modal_insert_api'
+	  	let name = $('option[value="'+service+'"]').html()
+
+		if (data['working'] == false) {
+		  $.gritter.add({
+	        title: 'Произошла ошибка',
+	        text: 'Не удалось подключиться к сервису <b>' + name + '</b>. Возможно указан неверный ключ. Попробуйте снова'
+	      });
+	      $('#modal_insert_api .progress_button').hide()
+	      log('Не удалось подключиться к sms-сервису <b>' + name + '</b>. Возможно указан неверный ключ')
+	      return
+	  	}
+
+		log('На счету ' + name + ': <span class="green_bord">' + data['balance'] + '</span> рублей')
+
+	  	let _data = {}
+	  	_data[service] = data['api_key']
+	  	ws_send({type: 'set_settings', data: _data});
+	  	log('Ключ ' + name + ' сохранён')
+	  	
+	  	let selector = $('option[value="' + service + '"]') 
+		if (selector.length > 0) {
+			selector.attr('key', data['api_key'])
+		}
+
+		close_modal(modal_id)
+
+		$('#modal_insert_api .progress_button').hide()
+
+		ws_send({type: 'sms_get_countries', data: {
+			'service': service.replace('_api_key', ''),
+			'api_key': data['api_key']
+		}});
+	}
+	function sms_count_data(data) {
+		updateLog(`Доступно <span class="blue_bord">${data['count']}</span> номеров для <b>${data['country']}</b>`, data['identifer'])
+	}
+	function balance_data(data) {
+		let name = $('option[value="'+data['service']+'"]').html()
+	  	if (data['working'] == false) {
+		  $.gritter.add({
+	        title: 'Произошла ошибка',
+	        text: 'Не удалось подключиться к сервису '+name+'. Возможно указан неверный ключ'
+	      });
+	      log('Не удалось подключиться к сервису '+name+'. Возможно указан неверный ключ')
+	      return
+	  	}
+
+		log('На вашем счету ' + name + ': <span class="green_bord">' + data['balance'] + '</span> рублей', 'balance_on_sms')
+	}
+
+  	function incoming_settings(data) {
+  		for (let setting in data) {
+  			let selector = $('option[value="' + setting + '"]') 
+  			if (selector.length > 0) {
+  				if (data[setting] != null && data[setting].length > 3) {
+  					selector.attr('key', data[setting])
+  					selector.attr('service', setting)
+  				} else {
+  					selector.attr('key', null)
+  					selector.attr('service', null)
+  				}
+  			}
+
+  			if (setting == 'set_two_fa') {
+  				if (data[setting] == 1) {
+  					$('input[class=two_fa][value=1]').attr('checked', 'checked')
+  				} else {
+  					$('input[class=two_fa][value=0]').attr('checked', 'checked')
+  				}
+  			}
+  			if (setting == 'generate_username') {
+  				if (data[setting] == 1) {
+  					$('input[class=generate_username][value=1]').attr('checked', 'checked')
+  				} else {
+  					$('input[class=generate_username][value=0]').attr('checked', 'checked')
+  				}
+  			}
+  			$('input[class=ignore_settings][value=0]').attr('checked', 'checked')
+  		}
+  	}
+
+
+  $(document).ready(function() {
+  WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+  
+    WS.onopen = function() {
+    	loading_stop()
+        ws_send({type: 'get_accounts'});
+        ws_send({type: 'get_settings'});
+    };
+    WS.onclose = function(event) {
+	    loading_start()
+	    red_log('Соединение с сервером потеряно');
+	 };
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+
+      ws_defs(evt);
+
+
+      if (data.type == 'balance_data') balance_data(f_data)
+  	  if (data.type == 'sms_count_data') sms_count_data(f_data)
+	  if (data.type == 'all_settings') incoming_settings(f_data)
+	  if (data.type == 'pre_add_key_check_balance') pre_add_key_check_balance(f_data)
+  	  if (data.type == 'sms_countries') sms_countries(f_data)
+
+  	  if (data.type == 'wait_code_manual_reg') wait_code_manual_reg(f_data)
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

@@ -1,0 +1,222 @@
+<div class="row-fluid account-stats"> 
+  <a id="accounts_length" class="quick-button metro black span2">
+    <span class="length">0</span>
+    <p>Активных аккаунтов</p>
+  </a>
+  <a id="accounts_teml_length" class="quick-button metro red span2">
+    <span class="length">0</span>
+    <p>Аккаунтов в архиве</p>
+  </a>
+  <a id="more_than_month_length" class="quick-button metro blue span2">
+    <span class="length">0</span>
+    <p>Более месяца отлёжка</p>
+  </a>
+  <a id="more_than_week_length" class="quick-button metro green span2">
+    <span class="length">0</span>
+    <p>Более недели отлёжка</p>
+  </a>
+  <a id="more_than_day_length" class="quick-button metro pink span2">
+    <span class="length">0</span>
+    <p>Более дня отлёжка</p>
+  </a>
+  <a id="just_now_registred_length" class="quick-button metro yellow span2">
+    <span class="length">0</span>
+    <p>Небольшая отлёжка</p>
+  </a>
+  <div class="clearfix"></div>        
+</div>
+
+<div class="row-fluid">
+  <div class="box span7">
+    <div class="box-header" data-original-title="">
+      <h2>Настройки</h2>
+    </div>
+
+    <div class="box-content">
+      <form class="form-horizontal" style="margin: 0;">
+
+        <div class="control-group">
+          <div class="head_settings">Сбор истории</div>
+        </div>
+
+        <div class="control-group">
+          <label class='settings-label'><span>Адрес донора</span></label>
+          <div class="controls fz">
+             <input id='from_group' type="text" />
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Собрать сообщения за последние </span></label>
+          <div class="controls">
+             <input save='yes' id="how_many_days" value="15" type="number" min="1" step="1">  дней</span>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <span style="font-weight: bold;padding-left: 230px;color: #578ebe;">или</span>
+          <div class="controls">
+             
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Собрать сообщения (начиная с даты) </span></label>
+          <div class="controls">
+             <input type="date" id='dpicker_start'>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Собрать сообщения (заканчивая датой) </span></label>
+          <div class="controls">
+             <input type="date" id='dpicker_end'>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Задержка парсера</span></label>
+          <div class="controls">
+             <input save='yes' id="add_sleep" value="0" type="number" min="0" step="0.1">  секунд <i class="icon-exclamation-sign" data-original-title="Необходимо, только если появляется ошибка FLOOD_WAIT" data-rel="tooltip"></i></span>
+          </div>
+        </div>
+        
+
+        <div class="control-group">
+          <label class="settings-label"><span>Делить файлы по </span></label>
+          <div class="controls">
+             <input save='yes' id="divide_by" value="1000" type="number" min="500" step="1" style="width: 75px;margin-right: 7px;">  сообщений</span>
+          </div>
+        </div>
+
+
+        <button id="get_group_info" class="btn button-large btn-success">Получить информацию</button>
+      </form>
+    </div>   
+  </div>
+
+
+  <div class="box span5">
+    <div class="box-header" data-original-title="">
+      <h2>Информация</h2>
+    </div>
+    <div class="box-content">
+      <div class="log-content h100vh h100p">  
+          <ul id="log">
+          </ul>
+      </div>
+    </div>   
+  </div>
+
+
+</div>
+
+<style>
+  .settings-label {
+    min-width: 300px;
+  }
+
+</style>
+
+<script>
+  
+  function dpick_end_set_today() {
+    var now = new Date();
+    var day = ("0" + now.getDate()).slice(-2);
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+    $('#dpicker_end').val(today);
+  }
+
+  function dpick_start_set_offset(x) {
+    var now = new Date();
+    now.setDate(now.getDate() + x);
+    var day = ("0" + now.getDate()).slice(-2);
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+    $('#dpicker_start').val(today);
+  }
+
+  
+ dpick_end_set_today();
+ dpick_start_set_offset(-15);
+
+ $('#how_many_days').change(function() {
+    dpick_end_set_today()
+    dpick_start_set_offset(-$(this).val())
+ })
+
+  loading_start();
+  var accounts_info = {};
+
+  $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom", delay: { show: 400, hide: 200 }});
+
+  $('#add_sleep').on('input',function(e){
+    console.log($(this).val());
+  });
+
+  $('#get_group_info').click(function(e) {
+    e.preventDefault();
+    let addr = $('#from_group').val();
+
+    if (addr.length <= 3) {
+      red_log('Адрес донора неверный или не указан');
+      return;
+    }
+
+
+    let dpicker_start = Date.parse($('#dpicker_start').val()) / 1000;
+    let dpicker_end = Date.parse($('#dpicker_end').val()) / 1000;
+
+
+    ws_send({type: 'get_group_info', data: {
+      addr: addr,
+      days: $('#how_many_days').val(),
+      add_sleep: $('#add_sleep').val(),
+      dpicker_start: dpicker_start,
+      dpicker_end: dpicker_end,
+      divide_by: $('#divide_by').val()
+    }});
+  });
+
+  function group_info_result(data) {
+    console.log(data);
+  }
+
+
+  $(document).ready(function() {
+
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop()
+        green_log('Соединение с сервером установлено');
+        ws_send({type: 'get_accounts'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+
+      console.log(data)
+      
+      if (data.type == 'error_handle') open_global_modal(f_data.ex_value, f_data.ex_traceback)
+
+      if (data.type == 'account_info') set_account_info(f_data);
+      if (data.type == 'log') ws_add_log(f_data);
+      if (data.type == 'close') window.close();
+      if (data.type == 'group_info_result') group_info_result(f_data);
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

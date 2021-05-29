@@ -1,0 +1,817 @@
+<style>
+  .rel {
+    position: relative;
+  }
+  .process_overlay {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100%);
+    height: calc(100%);
+    z-index: 10;
+  }
+
+  .circle{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #fcdc29;
+    border-radius: 50%;
+    animation: loading 1.0s cubic-bezier(.8, .5, .2, 1.4) infinite;
+    transform-origin: bottom center;
+    position: relative;
+  }
+  @keyframes loading{
+    0%{
+      transform: translateY(0px);
+      background-color: #fcdc29;
+    }
+    50%{
+      transform: translateY(50px);
+      background-color: #ef584a;
+    }
+    100%{
+      transform: translateY(0px);
+      background-color: #fcdc29;
+    }
+  }
+  .circle-1{
+    animation-delay: 0.1s;
+  }
+  .circle-2{
+    animation-delay: 0.2s;
+  }
+  .circle-3{
+    animation-delay: 0.3s;
+  }
+  .circle-4{
+    animation-delay: 0.4s;
+  }
+  .circle-5{
+    animation-delay: 0.5s;
+  }
+  .circle-6{
+    animation-delay: 0.6s;
+  }
+  .circle-7{
+    animation-delay: 0.7s;
+  }
+  .circle-8{
+    animation-delay: 0.8s;
+  }
+  .process_overlay .wrp {
+    position: absolute;
+    top: calc(50% - 10px);
+    left: calc(50% - 72px);
+    transform: translate(-50%, -50%);
+  }
+  .blur2 {
+    filter: blur(2px);
+  }
+  .table_cell_not_working {
+    text-align: center;
+    display: block;
+    color: white;
+    font-size: 15px;
+    background: #ff7777;
+    border-radius: 2px;
+  }
+  .table_cell_unknown {}
+  
+ .indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.3);
+  margin-top: 3px;
+}
+.indicator svg polyline {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.indicator svg polyline#back {
+  stroke: rgba(59,211,171,0.3);
+}
+.indicator svg polyline#front {
+  stroke: #3bd3ab;
+  stroke-dasharray: 12, 36;
+  stroke-dashoffset: 48;
+  animation: dash 1s linear infinite;
+}
+.cta {
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  color: #222;
+  font-weight: bold;
+}
+@-moz-keyframes dash {
+  62.5% {
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@-webkit-keyframes dash {
+  62.5% {
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@-o-keyframes dash {
+  62.5% {
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes dash {
+  62.5% {
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.tabulator-cell input[type="checkbox"] {
+      margin-top: -1px;
+}
+.tabulator-col-title .checker {
+  margin-left: 7px;
+}
+.signal {
+    height: 20px;
+    width: 55px;
+    display: inline-block;
+    margin-left: 25px;
+    margin-top: 3px;
+  
+}
+.wave {
+  width: calc(11% - 1px);
+  margin-left: 1px;
+  min-height: 20%;
+  display: inline-block;
+  background-color: #16a085;
+  border: thin solid #12816b;
+}
+.empty_wave {
+  background-color: #d0d0d03d;
+  border: thin solid #d2d2d2;
+}
+.signal .wave:nth-child(1) {height: 16.6%}
+.signal .wave:nth-child(2) {height: 33.2%}
+.signal .wave:nth-child(3) {height: 49.8%}
+.signal .wave:nth-child(4) {height: 66.4%}
+.signal .wave:nth-child(5) {height: 83%}
+.signal .wave:nth-child(6) {height: 99.6%}
+.bg_red {background-color: red;}
+.bg_orange {background-color: orange;}
+.bg_green {background-color: #A5DA74;}
+</style>
+
+<div class="row-fluid">
+  <div class="box span12 no_border mb20 rel">
+    <div class="process_overlay">
+      <div class="wrp">
+        <span class="circle circle-1"></span>
+        <span class="circle circle-2"></span>
+        <span class="circle circle-3"></span>
+        <span class="circle circle-4"></span>
+        <span class="circle circle-5"></span>
+        <span class="circle circle-6"></span>
+        <span class="circle circle-7"></span>
+        <span class="circle circle-8"></span>
+      </div>  
+    </div>
+    <div id="proxy_table" class="bs"></div>
+    <div class="buttons_row_proxy">
+      <button class="btn_outline btn_outline_info check_all_proxy">Проверить</button>
+      <button class="btn_outline btn_outline_danger delete_all_proxy">Удалить</button>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="row-fluid">
+  <div class="box span4 no_border">
+    <div class="box-content modern_border bs">
+      <div class="hsk_header">Добавить из файла</div>
+      <div class="dropify_zone">
+        <input type="file" id="input-file-now" class="dropify" />
+      </div>
+      <div class="buttons">
+        <button class="btn_outline btn_outline_info btn-block file_add">Добавить из файла</button>
+      </div>
+    </div> 
+  </div>
+
+  <div class="box span4 no_border">
+    <div class="box-content modern_border bs">
+      <div class="hsk_header">Добавить вручную</div>
+      <div class="textarea_zone">
+        <textarea class="textinput manual_add_input" rows="8" placeholder="type:ip:port:login:password:link"></textarea>
+      </div>
+      <div class="buttons">
+        <button class="btn_outline btn_outline_info btn-block manual_add">Добавить вручную</button>
+      </div>
+    </div>   
+  </div>
+
+  <div class="box span4 no_border">
+    <div class="box-content modern_border bs">
+<div style="font-family: 'Nunito', 'Roboto';font-size: 17px;">Формат ввода:</div>
+<br>
+<span style='color: #198ae3;'>type:ip:port:login:password</span><br>
+<br>
+Разделитель — двоеточие. Не @. Будьте внимательны<br>
+type — тип прокси. Это socks5, socks4, http либо mtproxy<br>
+ip — ip<br>
+port — порт<br>
+login — логин<br>
+password — пароль<br>
+<br>
+<div style="font-family: 'Nunito', 'Roboto';font-size: 17px;">Пример:</div>
+<br>
+
+<span style='color: #198ae3;'>socks5:5.8.50.236:5501:fae6Ig1E:ishiv9OG</span>
+    </div>   
+  </div>
+
+
+  
+
+
+</div>
+
+  <script>
+    /*
+    new duDialog('Alert Message', 'This is an alert message.');
+    new duDialog('CSSSCRIPT.COM', 'Are You Sure?', duDialog.OK_CANCEL, { 
+      okText: 'Okey',
+      callbacks: {
+        okClick: function(){
+          this.hide();
+        }
+      }
+    });
+    new duDialog('Select An Item', ['CSS', 'SCRIPT', 'COM'], {
+      selection: true,
+      callbacks: {
+        itemSelect: function(e, item){
+          // this.value
+        }
+      }
+    });
+    */
+
+    var selectedProxy = null;
+    $('.delete_all_proxy').click(function() {
+      let elems = ['Весь список', 'Только не рабочие', 'Выделенные'];
+      new duDialog('Удалить прокси?', elems, {
+        selection: true,
+        callbacks: {
+          itemSelect: function(e, item){
+            if (this.value == elems[0]) {
+              // all
+              processLoad(true);
+              ws_send({type: 'proxy2_delete_all_proxy'});
+            } else if (this.value == elems[1]) {
+              // not working
+              let proxies = [];
+              for (let cell of $('.tabulator-cell.not_working_proxy')) {
+                proxies.push($(cell).attr('key'));
+              }
+              if (proxies.length > 0) {
+                processLoad(true);
+                ws_send({type: 'proxy2_removeProxyByList', data: {
+                  proxies: proxies
+                }});
+              }
+            } else if (this.value == elems[2]) {
+              // selected
+              let proxies = [];
+              for (let cell of $('.tabulator-selected').find('[key]')) {
+                proxies.push($(cell).attr('key'));
+              }
+              if (proxies.length > 0) {
+                processLoad(true);
+                ws_send({type: 'proxy2_removeProxyByList', data: {
+                  proxies: proxies
+                }});
+              }
+            }
+          }
+        }
+      });
+
+      // new duDialog('', 'Удалить ВСЕ прокси?', duDialog.OK_CANCEL, { 
+      //   okText: 'Да',
+      //   cancelText: 'Отмена',
+      //   callbacks: {
+      //     okClick: function() {
+      //       processLoad(true);
+      //       ws_send({type: 'proxy2_delete_all_proxy'});
+      //       this.hide();
+      //     }
+      //   }
+      // });
+    });   
+
+    function proxy2_delete_all_proxy_cb() {
+      table.clearData();
+      processLoad(false);
+    }
+
+    function declOfNum(number, titles) {  
+        cases = [2, 0, 1, 1, 1, 2];  
+        return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];  
+    }
+
+    $('.file_add').click(function() {
+      if (selectedProxy.length <= 0) {
+        red_log('Ошибка. Мы не смогли обработать указанный файл');
+        return;
+      }
+
+      let compiled = [];
+      for (let proxy of selectedProxy) {
+        let chunks = proxy.split(':');
+        if (chunks.length < 2) continue;
+        if (chunks[0] != 'socks5' && chunks[0] != 'socks4' && chunks[0] != 'http' && chunks[0] != 'mtproxy') {
+          chunks.splice(0, 0, 'socks5');
+        }
+        compiled.push(chunks.join(':'));
+      }
+
+      ws_send({type: 'proxy2_add', data: {
+        proxy_list: compiled
+      }});
+    });
+
+
+    $('.manual_add').click(function() {
+      let data = $('.manual_add_input').val();
+      let proxy_list = [];
+      for (let proxy of data.split('\n')) {
+        proxy = proxy.trim();
+        if (proxy.length < 12) {
+          continue;
+        }
+        proxy_list.push(proxy);
+      }
+
+      if (proxy_list.length < 1) {
+        red_log('Нечего добавлять');
+        return;
+      }
+
+      let compiled = [];
+      for (let proxy of proxy_list) {
+        let chunks = proxy.split(':');
+        if (chunks.length < 2) continue;
+        if (chunks[0] != 'socks5' && chunks[0] != 'socks4' && chunks[0] != 'http' && chunks[0] != 'mtproxy') {
+          chunks.splice(0, 0, 'socks5');
+        }
+        compiled.push(chunks.join(':'));
+      }
+      
+      $('.manual_add_input').val('');
+      ws_send({type: 'proxy2_add', data: {
+        proxy_list: compiled
+      }});
+    });
+
+
+    $('.dropify').dropify({
+        messages: {
+            default: 'Укажите файл со списком прокси',
+            replace: '',
+            remove: '',
+            error: 'Произошла ошибка'
+        }
+    });
+
+    $('.dropify').change(function () {
+        const fileReader = new FileReader();
+        const files = $('.dropify').prop('files');
+
+        if (files.length == 0) {
+            red_log('Ошибка во время загрузки прокси из файла');
+            return;
+        }
+
+        fileReader.onload = () => {
+            selectedProxy = fileReader.result;
+
+            try {
+                selectedProxy = selectedProxy.split('\n');
+                let count = 0;
+                for (let proxy of selectedProxy) {
+                    proxy = proxy.trim();
+                    if (proxy.length < 3) continue;
+                    count += 1;
+                }
+
+                if ($('.dropify-preview .dropify-render .dropify-extension-notify').length == 0) {
+                    $('.dropify-preview .dropify-render').append('<span class="dropify-extension-notify"></span>');
+                }
+
+                $('.dropify-extension-notify').html(`${count} ${declOfNum(count, ['строка', 'строки', 'строк'])}`);
+            } catch (err) {
+                red_log('Ошибка во время обработки прокси');
+            }
+        };
+
+        fileReader.readAsText(files[0]);
+    });
+
+    function processLoad(show) {
+      if (show) {
+        $('.process_overlay').show();
+        $('#proxy_table').addClass('blur');
+      } else {
+        $('.process_overlay').hide();
+        $('#proxy_table').removeClass('blur');
+      }
+    }
+
+    var cellEditorUrl = function(cell, onRendered, success, cancel) {
+      input = document.createElement("input");
+      input.style.padding = "4px";
+      input.style.width = "100%";
+      input.style.boxSizing = "border-box";
+      onRendered(function() {input.focus()});
+      function onChange(){
+          if (input.value.length == 0) {success('Нет')}
+          success(input.value);
+      }
+      input.addEventListener("blur", onChange);
+      input.addEventListener("keydown", function(e){
+          if(e.keyCode == 13){onChange()}
+          if(e.keyCode == 27){cancel()}
+      });
+      return input;
+    }
+
+    var rowMenu = function(component, e){
+        var menu = [];
+
+        menu.push({
+          label:"<i class='fa icon-globe'></i> Проверить",
+          action:function(e, row){
+            let key = row.getData().key;
+            setLoadingCellState(`.sparkline_cell[key='${key}']`);
+            $('.buttons_row_proxy').addClass('blur');
+            ws_send({type: 'proxy2_check_one', data: {
+              proxy: row.getData()
+            }});
+          }
+        });
+
+        if(component.getData().switch_ip.length < 12){
+            menu.push({
+              label:"<i class='icon-refresh'></i> Сменить IP",
+              disabled: true
+            });
+        }else{
+            menu.push({
+              label:"<i class='icon-refresh'></i> Сменить IP",
+              action:function(e, row){
+
+              }
+            });
+        }
+
+        menu.push({separator:true});
+
+        menu.push({
+          label:"<i class='icon-trash'></i> Удалить",
+          action:function(e, row){
+            new duDialog('', 'Удалить прокси?', duDialog.OK_CANCEL, { 
+              okText: 'Да',
+              cancelText: 'Отмена',
+              callbacks: {
+                okClick: function() {
+                  processLoad(true);
+                  ws_send({type: 'proxy2_removeProxy', data: {
+                    proxy_line: row.getData()
+                  }});
+                  this.hide();
+                }
+              }
+            });
+
+            
+          }
+        });
+
+
+        return menu;
+    }
+
+    function logic2Bool(val) {
+      if (val == 'Да' || val == 'yes') {
+        return true
+      } else {
+        return false
+      }
+    }
+
+    function proxy2_edit_cb(data) {
+      setTimeout(function() {
+        processLoad(false);
+      }, 300);
+    }
+
+
+    var editCheck = function(cell){
+        let new_data = cell.getRow().getData()
+        new_data.register = logic2Bool(new_data.register);
+
+        if (new_data.switch_ip == 'Нет' || new_data.switch_ip == "No") {
+          new_data.switch_ip = null;
+        }
+
+        new_data.type = labelToType(new_data.type);
+
+        if (new_data.type == 4) {
+          new_data.is_ipv6 = true;
+        }
+
+        processLoad(true);
+        ws_send({type: 'proxy2_edit', data: {
+          proxy_line: new_data
+        }});
+
+        return true
+    }
+
+    var tabledata = [];
+
+    function typeToLabel(type) {
+      if (type == 2) {
+        return 'socks5';
+      }
+      if (type == 1) {
+        return 'socks4';
+      }
+      if (type == 3) {
+        return 'http';
+      }
+      return type;
+    }
+
+    function labelToType(label) {
+      if (label == 'socks5') {
+        return 2;
+      }
+      if (label == 'socks4') {
+        return 1;
+      }
+      if (label == 'http') {
+        return 3;
+      }
+
+      return label;
+    }
+
+
+
+    function setLoadingCellState(element) {
+      $(element).html(`<div class="indicator"> 
+          <svg width="16px" height="12px">
+            <polyline id="back" points="1 6 4 6 6 11 10 1 12 6 15 6"></polyline>
+            <polyline id="front" points="1 6 4 6 6 11 10 1 12 6 15 6"></polyline>
+          </svg>
+        </div>`);
+    }
+
+    // $('.check_all_proxy').click(function() {
+    //   setLoadingCellState('.sparkline_cell');
+    //   $('.buttons_row_proxy').addClass('blur');
+    //   ws_send({type: 'proxy2_check_all_proxy'});
+    // });
+
+    $('.check_all_proxy').click(function() {
+      let elems = ['Весь список', 'Выделенные'];
+      new duDialog('Какие прокси проверить?', elems, {
+        selection: true,
+        callbacks: {
+          itemSelect: function(e, item){
+            if (this.value == elems[0]) {
+              // all
+              setLoadingCellState('.sparkline_cell');
+              $('.buttons_row_proxy').addClass('blur');
+              ws_send({type: 'proxy2_check_all_proxy'});
+            } else if (this.value == elems[1]) {
+              // selected
+              if (selectedRows.length > 0) {
+                for (let selected of selectedRows) {
+                  setLoadingCellState(`.sparkline_cell[key="${selected.key}"]`);
+                }
+
+                $('.buttons_row_proxy').addClass('blur');
+                ws_send({type: 'proxy2_check_proxy_by_list', data: {
+                  proxies: selectedRows
+                }});
+              }
+            }
+          }
+        }
+      });
+    });
+
+
+    function proxy2_check_end() {
+      show_succes_box(true);
+      $('.buttons_row_proxy').removeClass('blur');
+    }
+
+    function proxy2_check_process(data) {
+      let element = $(`.sparkline_cell[key='${data.proxy_hash}']`);
+
+      if (!data.works) {
+        element.html('<span class="table_cell_not_working">Не работает</span>');
+        element.addClass('not_working_proxy');
+        return;
+      }
+
+      if (data.ping && Number.isInteger(data.ping)) {
+        let max_speed_ms = 10000;
+        let quality = 100-100/(max_speed_ms/data.ping);
+        element.html(`<div class="signal" speed="${quality}"></div>`);
+
+        updateSparkles();
+      }
+    }
+
+    function updateSparkles() {
+      for (let signal of $('.signal')) {
+        const signalFromPercent = (percent) => Math.ceil(6/100*percent);
+        const speedPercent = +$(signal).attr('speed');
+        const signalIndexes = signalFromPercent(speedPercent);
+        const colors = ['bg_red', 'bg_orange', 'bg_green'];
+        const colorIndex =   Math.ceil(signalIndexes * colors.length / 6);
+        
+        $(signal).html('');
+        for (let i = 0; i < 6; i++) {
+          let classList = 'wave';
+          if (i >= signalIndexes) {
+            classList += ' empty_wave'
+          } else {
+            classList += ` ${colors[colorIndex-1]}`;
+          }
+          $(signal).append(`<div class="${classList}"></div>`);
+        }
+      }
+
+    }
+
+    var speedFormatter = function(cell, formatterParams, onRendered){
+        onRendered(function(){
+            let data = cell.getData();
+            $(cell.getElement()).html('<span class="table_cell_unknown">Неизвестно</span>');
+            $(cell.getElement()).addClass('sparkline_cell');
+            $(cell.getElement()).attr('key', data.key);
+
+            if (data.speed && Number.isInteger(data.speed)) {
+              let max_speed_ms = 10000;
+              let quality = 100-100/(max_speed_ms/data.speed);
+              $(cell.getElement()).html(`<div class="signal" speed="${quality}"></div>`);
+              $(cell.getElement()).css('padding', '2px');
+              updateSparkles();
+            }
+        });
+    };
+
+    function secondsToTime(secs){
+      let days = Math.floor(secs / (60 * 60 * 24));
+      let hours = Math.floor(secs / (60 * 60));
+
+      return {hours, days}
+    }
+
+    var lineFormatter = function(cell, formatterParams, onRendered){
+    onRendered(function(){
+            $(cell.getElement()).sparkline(cell.getValue(), {width:"100%", type:"line", disableTooltips:true});
+        });
+    };
+
+    var selectedRows = [];
+    var table = new Tabulator("#proxy_table", {
+        layout:"fitDataStretch",
+        addRowPos:"top",
+        history:true,
+        height:"311px",
+        placeholder:"Не добавлено ни одного прокси",
+        initialSort:[{column:"ip", dir:"asc"}],
+        rowContextMenu: rowMenu,
+        columns:[
+          {formatter:"rowSelection", titleFormatter:"rowSelection", align:"center", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+            cell.getRow().toggleSelect();
+          }},
+          {title:"Адрес", field:"ip", editor:"input", width: 150, cellEdited: editCheck},
+          {title:"Порт", field:"port", editor:"input", width: 100, cellEdited: editCheck},
+          {title:"Тип", field:"type", editor:"select", width: 100, cellEdited: editCheck, editorParams: {values:["socks5", "socks4", "http", "mtproxy"]}},
+          {title:"Использован", field:"used", sorter:"number", hozAlign:"left", width: 130},
+          {title:"Регистрация", field:"register", width: 130, editor:"select", cellEdited: editCheck, editorParams: {values:["Да", "Нет"]}},
+          {title:"Скорость", field:"speed", hozAlign:"left", formatter:speedFormatter, width: 120},
+          {title:"Смена IP (url)", field:"switch_ip", editor:"input", editor:cellEditorUrl, cellEdited: editCheck, width: 250}
+        ],
+        rowSelectionChanged:function(data, rows){
+          selectedRows = [];
+          if (rows.length > 0) {
+            selectedRows = [];
+            for (row of rows) {
+              selectedRows.push(row.getData())
+            }
+          }
+        }
+    });
+  </script>
+
+
+<script>
+$("input:checkbox, input:radio").uniform();
+$('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+function proxy2_proxy_list(data) {
+  processLoad(false);
+  table.clearData();
+  for (let key in data.proxy_list) {
+    let proxy = data.proxy_list[key];
+    table.addRow({
+      key: key,
+      ip: proxy.ip,
+      port: proxy.port,
+      type: typeToLabel(proxy.type),
+      speed: proxy.speed,
+      used: proxy.used,
+      register: proxy.register ? 'Да' : 'Нет',
+      switch_ip: proxy.switch_ip ? proxy.switch_ip : 'Нет',
+      last_check_time: proxy.last_check_time
+    });
+  }
+}
+
+
+$(document).ready(function() {
+  WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+  
+	WS.onopen = function() {
+    loading_stop()    
+    ws_send({type: 'proxy2_get_proxy_list'});
+    ws_send({type: 'get_accounts'});
+	};
+
+  WS.onclose = function(event) {
+    loading_start()
+    red_log('Соединение с сервером потеряно');
+  };
+
+	WS.onmessage = function (evt) {
+	  var data = JSON.parse(evt.data)
+	  var f_data = data.data
+
+    ws_defs(evt);
+
+   if (data.type == 'proxy2_proxy_list') {
+      proxy2_proxy_list(f_data)
+   };
+    
+   if (data.type == 'proxy2_edit_cb') {
+      proxy2_edit_cb(f_data)
+   };
+
+   if (data.type == 'proxy2_delete_all_proxy_cb') {
+      proxy2_delete_all_proxy_cb(f_data)
+   };
+
+
+
+
+   if (data.type == 'proxy2_check_process') {
+      proxy2_check_process(f_data)
+   };
+
+   if (data.type == 'proxy2_check_end') {
+      proxy2_check_end()
+   };
+   
+	};
+})
+
+window.onbeforeunload = function() {
+  WS.onclose = function () {};
+  WS.close();
+};
+</script>

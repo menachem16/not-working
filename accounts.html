@@ -1,0 +1,1431 @@
+<link rel="stylesheet" href="css/jquery.contextMenu.min.css">
+<script src="js/jquery.contextMenu.min.js"></script>
+<script src="js/jquery.ui.position.min.js"></script>
+
+<style>
+  .h2btn_accs {
+    margin: 0;
+    font-size: 15px;
+    padding: 10px 0;
+    text-align: center;
+  }
+  .account_buttons button {
+      border: none;
+      padding: 10px 20px;
+      height: 40px; 
+      color: white;
+      font-size: 20px;
+      width: 90%;
+      line-height: 16px;
+  }
+  .btn-info {
+    background-color: #2965c3;
+    border-color: #2965c3;
+  }
+  .btn-info:hover {
+    background-color: #2667ce;
+    border-color: #2667ce;
+  }
+
+  .account_buttons .btn i {
+      margin-top: 0px;
+      margin-right: 5px;
+  }
+
+</style>
+<div class="modal-wrapper" id='modal_open_buttons'>
+  <div class=" modal_btns">
+      <div class="row-fluid">
+        <div class="account_buttons">
+          <h2 class='btn-small btn-info h2btn_accs'>Выбрано <span class="how_accs">10</span> аккаунтов</h2>
+          <button class="btn btn-small btn-info" id="check_accounts"><i class="halflings-icon white zoom-in"></i> Проверить аккаунты <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="set_account_two_avatars"><i class="icon-camera white"></i> Установить аватары <div class="progress_button"></div></button>
+          <button class="btn btn-small btn-info" id="set_account_username"><i class="halflings-icon user white"></i> Установить юзернеймы <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="set_account_names"><i class="halflings-icon repeat white"></i> Установить новые имена <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="set_account_fa"><i class="halflings-icon exclamation-sign white"></i> Установить 2fa <div class="progress_button"></div></button>
+
+
+          <button class="btn btn-small btn-info" id="set_account_bio"><i class="halflings-icon tag white"></i> Установить bio <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="to_archive"><i class="halflings-icon white lock"></i> Перенести в архив <div class="progress_button"></div></button>
+          <button class="btn btn-small btn-info" id="from_archive"><i class="halflings-icon share-alt white"></i> Восстановить из архива <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info"  id="get_code"><i class="halflings-icon white edit"></i> Получить код авторизации <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="check_accounts_spam"><i class="halflings-icon warning-sign white"></i> Проверка на спамблок <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="unsubscribe_all"><i class="halflings-icon warning-sign white"></i> Массовая отписка <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-info" id="clear_sessions"><i class="halflings-icon warning-sign white"></i> Завершить сессии <div class="progress_button"></div></button>
+
+          <button class="btn btn-small btn-danger" id="delete_accounts_main"><i class="halflings-icon white trash"></i>Удалить <div class="progress_button"></div></button>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+      <div class="row-fluid accounts_check">   
+        <div class="box span12">
+          <div class="box-header" data-original-title>
+            <h2><i class="halflings-icon white user"></i><span class="break"></span>Ваши активные сессии</h2>
+          </div>
+          <div class="box-content">
+            <div class="account_range">
+                  <div class="open_buttons">
+                    <i class="icon-dashboard"></i>
+                  </div>
+
+                  <span>Выбрать диапазон аккаунтов: </span>
+                  <div class="slider sliderRangeAccountsCheck red"></div> <span class="chose_all">выбрать все</span>
+                  <div class="field_notice">(<span class="must sliderRangeLabel" style="color:  black;"></span>)</div>
+            </div>
+          
+          <div class="box-content fpn" id="check_result">
+            <span class="label label-info lnp">Всего: <span class="label sublabel" id="t_all">0</span> <div class="lds-dual-ring check_accounts_progress"></div></span>
+            <span class="label label-success lnp">Обработано: <span class="label sublabel" id="t_checked">0</span> <div class="lds-dual-ring check_accounts_progress"></div></span>
+            <span class="label label-warning lnp">Осталось обработать: <span class="label sublabel" id="t_need_check">0</span> <div class="lds-dual-ring check_accounts_progress"></div></span>
+            <span class="label label-important lnp">Забанено: <span class="label sublabel" id="t_banned">0</span> <div class="lds-dual-ring check_accounts_progress"></div></span>
+            <span class="label label-inverse lnp">Ошибки подключения: <span class="label sublabel" id="t_errors">0</span> <div class="lds-dual-ring check_accounts_progress"></div></span>
+          </div>
+
+            <div class="clearfix"></div>
+
+            <div class="acc_table">
+              <table class="table table-striped table-bordered">
+                <thead class='accounts_list_head'>
+                  <tr>
+                    <th>#</th>
+                    <th>Аватар</th>
+                    <th>Юзернейм</th>
+                    <th>Имя</th>
+                    <th>Телефон</th>
+                    <th>Отлёжка</th>
+                    <th>Статус</th>
+                    <th class="check_status"></th>
+                  </tr>
+                </thead>   
+                <tbody id='accounts_list'></tbody>
+              </table>   
+            </div>        
+          </div>
+        </div><!--/span-->
+      </div><!--/row-->
+
+  <div class="bio_modal">
+    <div class="bio_container">
+      <h2>Введите описание (bio) для аккаунтов</h2>
+      <input class="input-xlarge focused" type="text" placeholder="{Я дизайнер из Москвы|Люблю нюхать цветы}">
+      <span class='count'><span id='bio_count'>0</span>/70</span>
+      <div>
+        <button id="bio_submit" class="btn btn-primary">Принять</button>
+        <button class="cancel_bio btn">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-wrapper" id='modal_choose_avatar'>
+  <div class="modal">
+    <div class="head">
+      <a class="btn-close trigger" href="javascript:;"></a>
+    </div>
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Какие аватары следует использовать?</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 center">
+          <button id='i_pick_random_avatar'>Случайные</button>
+        </div>
+        <div class="span6 center">
+          <button id='i_pick_custom_avatar' data-original-title="Должны находится в директории Inviter/avatars/" data-rel="tooltip">Собственные</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_choose_names'>
+  <div class="modal">
+    <div class="head">
+      <a class="btn-close trigger" href="javascript:;"></a>
+    </div>
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <h1>Какие имена следует использовать?</h1>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" placeholder="Можно оставить пустым" id='input_name'>
+          <button input='#input_name'>Установить</button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<div id='report_modal' class="modal_window">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="inner">
+            <div>
+              <h2>Результаты проверки</h2>
+              <p>Всего аккаунтов: <span class='green_info mall'>0</span></p>
+              <p>Проверено: <span class='green_info mcheck'>0</span></p>
+              <p>Забанено: <span class='warning mban'>0</span></p>
+              <p>Со спамблоком: <span class='warning mspam'>0</span> <i class="icon-briefcase move_archive_icon" data-original-title="Архивировать все аккаунты со спамблоком" data-rel="tooltip"></i></p>
+              <p>Не смогли подключиться: <span class='yell merr'>0</span></p>
+              <p>Проверка заняла: <b><span class='mtimes'>0</span></b></p>
+              <br>
+              <div class="col50">
+                <h2>Отлежка</h2>
+                <p>Более дня: <span class='mmore_than_day'>0</span></p>
+                <p>Более месяца: <span class='mmore_than_month'>0</span></p>
+                <p>Более недели: <span class='mmore_than_week'>0</span></p>
+                <p>Недавно: <span class='mnow'>0</span></p>
+                <p>В архиве: <span class='mtemp_length'>0</span></p>
+              </div>
+              <div class="col50">
+                <h2>По параметрам</h2>
+                <p>Установлено юзернеймов: <span class='musernames'>0</span></p>
+                <p>С аватарами: <span class='mava'>0</span></p>
+                <p>С bio: <span class='mbio'>0</span></p>
+                <p>С 2fa: <span class='mtfa'>0</span></p>
+              </div>
+              
+              <div class="account_func_panel" style="text-align: center;">
+                <button class="btn btn-small btn-danger disabledb" id="delete_banned" style="border: none;">Удалить забаненые аккаунты (<span>0</span>)</button>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-wrapper" id='modal_auth_wait_code'>
+  <div class="modal">
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <span style="text-align: center;display: block;font-size: 20px;    margin-top: 5px;">Авторизуетесь с указанным ниже телефоном</span>
+          <span style="text-align: center;display: block;font-size: 17px;    margin-bottom: 20px;">И нажмите "Принять"</span>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" id='hidden' style="display: none;">
+          <span id='wait_code_phone' style="border: 1px solid #bbbbbb;width: 90%;box-sizing: border-box;padding: 8px;font-size: 18px;display: inline-block;margin-bottom: 10px;"></span>
+          <button input='#code_val'>Принять <div class="progress_button"></div></button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrapper" id='modal_auth_wait_code_success'>
+  <div class="modal">
+    <div class="modal_content">
+      <div class="row-fluid">
+        <div class="span12">
+          <span style="text-align: center;display: block;font-size: 22px;    margin-top: 5px;margin-bottom: 20px;">Код для <span id='wait_code_phone_label_success'></span>:</span>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3 center">
+          <input type="text" id='hidden' style="display: none;">
+          <span id='wait_code_phone_success' style="border: 1px solid #bbbbbb;width: 90%;box-sizing: border-box;padding: 8px;font-size: 18px;display: inline-block;margin-bottom: 10px;"></span>
+          <button input='#code_val'>Принять <div class="progress_button"></div></button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .dn {
+    display: none;
+  }
+  .move_archive_icon {
+    margin-left: 5px;
+    vertical-align: top;
+    cursor: pointer;
+    color: #2b2b2b;
+  }
+  .modal_btns {
+    width: 255px;
+    background: transparent;
+    margin: 50% 0 0 -125px;
+  }
+  .col50 {
+    width: 220px;
+    display: inline-block;
+        vertical-align: top;
+  }
+  .open_buttons {
+      display: inline-block;
+      color: #000000;
+      font-size: 20px;
+      border: 1px solid #00000052;
+      padding: 9px 10px 8px 11px;
+      vertical-align: middle;
+      margin-right: 15px;
+      cursor: pointer;
+  }
+  .modal_window {
+  display: none;
+  position: fixed; /* Stay in place */
+  z-index: 9999999; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    width: 500px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    border: none;
+}
+#report_modal .modal-content {
+    background-attachment: scroll;
+    background-image: url('img/mbg.png');
+}
+span.yell {
+  color: #ff8d00;
+  font-weight: bold;
+}
+/* The Close Button */
+.close {
+    color: #000;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.modal-content .inner {
+    padding-top: 20px;
+    padding-left: 10px;
+}
+.modal-content .inner p {
+  font-size: 15px;
+}
+.modal-content .inner h2 {
+  padding-bottom: 4px;
+}
+.account_buttons button {
+    margin-bottom: 3px;
+    display: block;
+    width: 255px;
+    text-align: left;
+    font-size: 15px;
+    margin: 0;
+    height: 35px;
+}
+.account_buttons {
+  position: fixed;
+  background: white;
+}
+.black_bg {
+  position: fixed;
+  display: none;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background: #000000ab;
+  z-index: 999999;
+}
+</style>
+
+
+<script>
+    
+    $('#accounts_list').contextMenu({
+        selector: 'tr',
+        build: function() {
+          unsetActives();
+          
+        },
+        callback: function(key, options) {
+            setActiveAccount($(this).attr('phone'));
+
+            if (key == "check_account") {
+              $('#check_accounts').click();
+            }
+
+            if (key == "set_avatar") {
+              $('#set_account_two_avatars').click();
+            }
+
+            if (key == "set_username") {
+              $('#set_account_username').click();
+            }
+
+            if (key == "set_name") {
+              $('#set_account_names').click();
+            }
+
+            if (key == "set_bio") {
+              $('#set_account_bio').click();
+            }
+
+            if (key == "set_twofa") {
+              $('#set_account_fa').click();
+            }
+
+            if (key == "get_code") {
+              $('#get_code').click();
+            }
+
+            if (key == "move_to_archive") {
+              $('#to_archive').click();
+            }
+
+            if (key == "unsubscribe_all") {
+              $('#unsubscribe_all').click();
+            }
+
+            if (key == "clear_sessions") {
+              $('#clear_sessions').click();
+            }
+
+            if (key == "delete") {
+              $('#delete_accounts_main').click();
+            }
+        },
+        items: {
+            "check_account": {name: "Проверить"},
+            "sep1": "---------",
+            "set_avatar": {name: "Установить аватар"},
+            "set_username": {name: "Установить юзернейм"},
+            "set_name": {name: "Установить новое имя"},
+            "set_bio": {name: "Установить описание"},
+            "set_twofa": {name: "Установить 2FA-пароль"},
+            "sep2": "---------",
+            "unsubscribe_all": {name: "Отписаться от всех групп/каналов"},
+            "clear_sessions": {name: "Завершить все прочие авторизации"},
+            "sep4": "---------",
+            "get_code": {name: "Получить код авторизации"},
+            "move_to_archive": {name: "Перенести в архив"},
+            "sep3": "---------",
+            "delete": {name: "Удалить"}
+        }
+    });
+
+    loading_start()
+
+    var accounts_info = {}
+    var start_check_time = 0
+
+    $('.close').click(function() {
+        $('.modal_window').hide();
+    });
+
+    $('#set_account_bio').click(function() {
+      $('.bio_modal').addClass('showing');
+      $('.bio_modal input').val('')
+      
+    })
+
+    $('.bio_modal .cancel_bio').click(function() {
+      $('.bio_modal').removeClass('showing');
+    })
+
+    $('.bio_modal input').on('input', function(e){
+        var len = $(this).val().length
+        $("#bio_count").html(len)
+
+        if (len >= 70) {
+          $(this).val($(this).val().substring(0, 69));
+        }
+    });
+
+    function wait_code_cb_success(data) {
+      loading_stop();
+      $('#wait_code_phone_label_success').html(data.phone);
+      $('#wait_code_phone_success').html(data.code);
+      open_input_modal('modal_auth_wait_code_success');
+    }
+
+    function getActiveAccounts() {
+      var result = []
+      var sels = $('#accounts_list tr')
+      for (var i = 0; i < sels.length; i++) {
+        var acc = $(sels[i])
+        if (acc.hasClass('active')) {
+          result.push(acc)
+        }
+      }
+      return result;
+    }
+    function setActiveAccount(phone) {
+      $(`#accounts_list tr[phone="${phone}"]`).addClass('active');
+    }
+    function unsetActives() {
+      var sels = $('#accounts_list tr')
+      for (var i = 0; i < sels.length; i++) {
+        $(sels[i]).removeClass('active')
+      }
+      $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+      $('.sliderRangeAccountsCheck').removeClass('opacity03')
+    }
+
+    function selectByIndex(x, y) {
+      var sels = $('#accounts_list tr')
+      for (var i = 0; i < sels.length; i++) {
+        if (i+1 >= x && i+1 <= y) {
+          $(sels[i]).addClass('active')
+        }
+      }
+    }
+
+    $('.chose_all').click(function() {
+      if ($(this).hasClass('choseed_all') == false) {
+        var sels = $('#accounts_list tr')
+        for (var i = 0; i < sels.length; i++) {
+          $(sels[i]).addClass('active')
+        }
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+
+        $(this).addClass('choseed_all')
+        $(this).html('снять выбор')
+      } else {
+        unsetActives()
+        $(this).removeClass('choseed_all')
+        $(this).html('выбрать все')
+      }
+    })
+  
+    function set_full_account_info(data) {
+      var table = ''
+
+      $('#t_all').html(data['length']);
+
+      var app_id_list = {}
+
+      for (var account in data.account_list) {
+        var ac_info = data.account_list[account]
+        var number = account
+
+        var avatar = './img/default.png'
+        if (ac_info.avatar != 'default') {
+          if (ac_info.avatar != null) {
+            avatar = ac_info.avatar
+            avatar = avatar.replace('static/', '')
+          }
+        }
+
+        var username = '<span class="cline">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var phone = ac_info.phone
+
+        var lives = ac_info.lives
+        var cl_lives = 'lgreen'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        var status = ''
+
+        var pass_str = '2fa пароль'
+        if ('password_str' in ac_info) {
+          pass_str += ': ' + ac_info.password_str;
+        }
+
+        if (ac_info.password) {
+          status += '<i data-original-title="' + pass_str + '" data-rel="tooltip" class="twofa icon-lock"></i> '
+        }
+
+        if (typeof ac_info.bio != 'undefined' && ac_info.bio.length > 0) {
+          status += `<i data-original-title="BIO: ${ac_info.bio}" data-rel="tooltip" class="with_bio icon-bullhorn"></i> `
+        }
+
+        if (ac_info.avatar != null) {
+          status += '<i data-original-title="Аватар установлен" data-rel="tooltip" class="with_avatar icon-camera"></i> '
+        }
+
+
+        table += `<tr phone="${phone}">`
+        table += `<td class="number center"><span class="ol">${number}</span></td>`
+        table += `<td class="avatar center"><img src="${avatar}" onerror="this.src = './img/default.png'"/></td>`
+        table += `<td class='username'>${username}</td>`
+        table += `<td class='name'>${name}</td>`
+        table += `<td class="phone center">${phone}</td>`
+        table += `<td class="lives center"><span class="${cl_lives}">${lives}</span></td>`
+        table += `<td class="status">${status}</td>`
+        table += `<td class="check_status"></td>`
+        table += `</tr>`
+      }
+
+
+      $('#accounts_list').append(table)
+
+      $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+      $('#accounts_list tr').click(function() {
+        if ($(this).hasClass('active') == false) {
+          $(this).addClass('active')
+        } else {
+          $(this).removeClass('active')
+        }
+      })
+
+      $('#bio_submit').click(function() {
+        $('.bio_modal').removeClass('showing');
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+        }
+
+        var bio_text = $('.bio_modal input').val()
+
+        $('#t_checked').html('0')
+        $('#t_need_check').html(phones.length)
+        $('#set_account_bio .progress_button').css({display: 'inline-block'});
+        loading_start();
+        ws_send({type: 'ws_set_bio', data: phones, bio_text: bio_text});
+      })
+
+      
+      $('#set_account_fa').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+        }
+
+        $('#t_checked').html('0')
+        $('#t_need_check').html(phones.length)
+        $('#ws_set_account_fa .progress_button').css({display: 'inline-block'});
+
+        loading_start();
+        ws_send({type: 'ws_set_account_fa', data: {
+          phones
+        }});
+      })
+
+
+      $('#set_account_username').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+        }
+
+        $('#t_checked').html('0')
+        $('#t_need_check').html(phones.length)
+        $('#set_account_username .progress_button').css({display: 'inline-block'});
+        loading_start();
+        ws_send({type: 'ws_set_account_username', data: phones});
+      })
+
+      $('#set_account_names').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+        }
+
+        open_input_modal('modal_choose_names').then(function(name) {
+          if (name == null) {
+            return
+          }
+
+          $('#t_checked').html('0')
+          $('#t_need_check').html(phones.length)
+          $('#set_account_names .progress_button').css({display: 'inline-block'});
+          loading_start();
+          ws_send({type: 'ws_set_account_names', data: {phones: phones, name: name}});
+        })
+      })
+
+
+      
+
+
+      $('#set_account_two_avatars').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        
+        open_modal('modal_choose_avatar').then(function(_id) {
+          var phones = []
+          for (var acc in accounts) {
+            phones.push(accounts[acc].attr('phone'))
+          }
+
+          var custom = true
+          if (_id == null) {
+            return
+          }
+          if ($(_id).attr('id') == 'i_pick_random_avatar') {custom = false}
+          $('#t_checked').html('0')
+          $('#t_need_check').html(phones.length)
+          $('#set_account_two_avatars .progress_button').css({display: 'inline-block'});
+
+          loading_start();
+          ws_send({type: 'ws_set_avatars', data: {phones: phones, custom: custom}});
+        })
+      })
+
+      $('#to_archive').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+        }
+
+        loading_start()
+        ws_send({type: 'to_archive', data: phones});
+      })
+
+      $('#from_archive').click(function() {
+        if (accounts_info.temp_length == 0) {
+          red_log('Не найдено ни одного аккаунта');
+          return 
+        }
+        loading_start()
+        ws_send({type: 'from_archive'});
+      })
+
+      $('#unsubscribe_all').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+          var selector = $(`tr[phone="${accounts[acc].attr('phone')}"]`)
+          selector.removeClass('account_banned').removeClass('account_not_works')
+          var fnd = selector.find('td.check_status')
+          fnd.html('<i class="icon-time process"></i>')
+        }
+        loading_start();
+        $('#t_checked').html('0')
+      $('#t_need_check').html(phones.length)
+        ws_send({type: 'unsubscribe_all', data: {
+            accounts: phones
+        }});
+      })      
+
+      $('#clear_sessions').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        var phones = []
+        for (var acc in accounts) {
+          phones.push(accounts[acc].attr('phone'))
+          var selector = $(`tr[phone="${accounts[acc].attr('phone')}"]`)
+          selector.removeClass('account_banned').removeClass('account_not_works')
+          var fnd = selector.find('td.check_status')
+          fnd.html('<i class="icon-time process"></i>')
+        }
+        loading_start();
+        $('#t_checked').html('0')
+        $('#t_need_check').html(phones.length)
+        ws_send({type: 'clear_sessions', data: {
+            accounts: phones
+        }});
+      })
+
+
+      
+      $('#get_code').click(function() {
+        var accounts = getActiveAccounts()
+
+        if (accounts.length == 0) {
+          red_log('Не выбрано ни одного аккаунта');
+          return 
+        }
+
+        if (accounts.length > 1) {
+          red_log('Можно выбрать только один аккаунт');
+          return 
+        }
+
+        var phone = accounts[0].attr('phone');
+
+        $('#wait_code_phone').html(phone);
+        open_input_modal('modal_auth_wait_code').then(function() {
+          ws_send({type: 'wait_code_cb_ready', data: {
+            phone: phone
+          }});
+
+          loading_start();
+        });
+
+        // ws_send({type: 'get_code', data: {phone: accounts[0]}});
+      })
+      
+
+      $('#accounts_list tr').click(function() {
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      }) 
+
+      loading_stop()
+    }
+
+    $('#check_accounts_spam').on('click', function() {
+      var accounts = getActiveAccounts()
+      if (accounts.length == 0) {
+        red_log('Не выбрано ни одного аккаунта');
+        return 
+      }
+
+      var phones = []
+      for (var acc in accounts) {
+        phones.push(accounts[acc].attr('phone'))
+        var selector = $(`tr[phone="${accounts[acc].attr('phone')}"]`)
+        selector.removeClass('account_banned').removeClass('account_not_works')
+        var fnd = selector.find('td.check_status')
+        fnd.html('<i class="icon-time process"></i>')
+
+      }
+
+      ws_send({type: 'check_accounts_spam', data: phones});
+      $('.check_status').addClass('show');
+      var sels = $('#accounts_list tr')
+      for (var i = 0; i < sels.length; i++) {
+        $(sels[i]).removeClass('active')
+      }
+
+      start_check_time = new Date().getTime() / 1000;
+      $('#delete_banned span').html('0')
+      $('#check_result').show()    
+      $('#t_checked').html('0')  
+      $('#t_need_check').html(phones.length)
+      $('.check_accounts_progress').addClass('dshow')
+      $('#check_accounts .progress_button').css({display: 'inline-block'});
+    })
+
+
+    $('#check_accounts').on('click', function() {
+      var accounts = getActiveAccounts()
+      if (accounts.length == 0) {
+        red_log('Не выбрано ни одного аккаунта');
+        return 
+      }
+
+      var phones = []
+      for (var acc in accounts) {
+        phones.push(accounts[acc].attr('phone'))
+        var selector = $(`tr[phone="${accounts[acc].attr('phone')}"]`)
+        selector.removeClass('account_banned').removeClass('account_not_works')
+        var fnd = selector.find('td.check_status')
+        fnd.html('<i class="icon-time process"></i>')
+
+      }
+
+      ws_send({type: 'check_accounts', data: phones});
+      $('.check_status').addClass('show');
+      var sels = $('#accounts_list tr')
+      for (var i = 0; i < sels.length; i++) {
+        $(sels[i]).removeClass('active')
+      }
+
+      start_check_time = new Date().getTime() / 1000;
+      $('#delete_banned span').html('0')
+      $('#check_result').show()    
+      $('#t_checked').html('0')  
+      $('#t_need_check').html(phones.length)
+      $('.check_accounts_progress').addClass('dshow')
+      $('#check_accounts .progress_button').css({display: 'inline-block'});
+    })
+
+
+    $('#delete_banned').click(function() {
+      var result = []
+      var sels = $('tr.account_banned')
+      for (var i = 0; i < sels.length; i++) {
+        var acc = $(sels[i])
+        result.push(acc.attr('phone'))
+      }
+
+      if (result.length == 0) {
+        red_log('Нет ни одного забаненого аккаунта');
+        return 
+      }
+
+      ws_send({type: 'delete_accounts', data: result});
+      $('#delete_banned span').html('0')
+      $('#delete_banned').addClass('disabledb')
+      loading_start()
+    })
+
+    $('#delete_accounts_main').click(function() {
+      new duDialog(null, 'Вы уверены, что хотите удалить выделенные аккаунты?', duDialog.OK_CANCEL, { 
+        okText: 'Продолжить',
+        cancelText: 'Отмена',
+        callbacks: {
+          okClick: function(){
+            delete_accounts_main_f();
+            this.hide();
+          }
+        }
+      });
+    });
+
+    function delete_accounts_main_f() {
+      var accounts = getActiveAccounts()
+
+      if (accounts.length == 0) {
+        red_log('Не выбрано ни одного аккаунта');
+        return 
+      }
+
+      var phones = []
+      for (var acc in accounts) {
+        phones.push(accounts[acc].attr('phone'))
+      }
+
+      $('#t_checked').html('0')
+      $('#t_need_check').html(phones.length)
+      ws_send({type: 'delete_accounts', data: phones});
+      loading_start()
+    }
+    
+
+    function update_row(works, reason, ac_info) {
+      var phone = ac_info.phone
+      var selector = $(`tr[phone="${phone}"]`)
+
+      var avatar = './img/default.png'
+      if (ac_info.avatar != 'default') {
+        if (ac_info.avatar != null) {
+          avatar = ac_info.avatar
+          avatar = avatar.replace('static/', '')
+        }
+      }
+
+      if (works == true) { 
+        var username = '<span class="opacity03">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var lives = ac_info.lives
+        var cl_lives = 'green'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        var status = ''
+        var pass_str = '2fa пароль'
+        if ('password_str' in ac_info) {
+          pass_str += ': ' + ac_info.password_str;
+        }
+
+        if (ac_info.password) {
+          status += '<i data-original-title="' + pass_str + '" data-rel="tooltip" class="twofa icon-lock"></i> '
+        }
+
+        if (typeof ac_info.bio != 'undefined' && ac_info.bio.length > 0) {
+          status += `<i title="BIO: ${ac_info.bio}" data-rel="tooltip" class="with_bio icon-bullhorn"></i> `
+        }
+
+        if (ac_info.avatar != null) {
+          status += '<i title="Аватар установлен" data-rel="tooltip" class="with_avatar icon-camera"></i> '
+        }
+        
+        selector.find('td.avatar').html(`<img src="${avatar}" />`)
+        selector.find('td.username').html(username)
+        selector.find('td.name').html(name)
+        selector.find('td.lives span').html(lives)
+        selector.find('td.status').html(status)
+      }
+    }
+
+    function set_account_checked(data) {
+      var works = data.works
+      var ac_info = data.info
+      var reason = data.reason
+
+      update_row(works, reason, ac_info)
+
+      var phone = ac_info.phone
+      var selector = $(`tr[phone="${phone}"]`)
+
+      $('#t_checked').html(parseInt($('#t_checked').html()) + 1)
+      $('#t_need_check').html(parseInt($('#t_need_check').html()) - 1)
+
+      if (works == true) { 
+        selector.addClass('account_works')
+        var is_spam = '';
+        if ('spamblock' in ac_info && ac_info.spamblock) {
+          is_spam = '<i title="Спамблок" data-rel="tooltip" class="icon-umbrella spamblock"></i>';
+          selector.addClass('account_spamblock')
+        } 
+        selector.find('td.check_status').html('<i title="Аккаунт работает" data-rel="tooltip" class="icon-ok works"></i>' + is_spam)
+      } else {
+        selector.addClass('account_not_works')
+        selector.find('td').addClass('warning')
+        if (reason == 'UserDeactivatedError' || reason == 'AuthKeyUnregisteredError') {
+          var current = parseInt($('#delete_banned span').html())
+          $('#delete_banned span').html(current+1)
+          $('#delete_banned').removeClass('disabledb')
+          selector.find('td.check_status').html('<i title="Аккаунт забанен" data-rel="tooltip" class="icon-trash not_works"></i>')
+          selector.addClass('account_banned')
+          $('#t_banned').html(parseInt($('#t_banned').html()) + 1)
+        }
+        if (reason == 'ConnectionError' || reason == 'Exception' || reason == 'TimeoutError') {
+          var tlt = 'Ошибка подключения'
+          if (reason == 'TimeoutError') {
+            tlt = 'Таймаут подключения'
+          }
+          selector.find('td.check_status').html(`<i title="${tlt}" data-rel="tooltip" class="icon-warning-sign con_error"></i>`)
+          $('#t_errors').html(parseInt($('#t_errors').html()) + 1)
+        }        
+      }
+    }
+
+    function set_account_data_process(data) {
+      var works = data.works
+      var ac_info = data.info
+      var reason = data.reason
+
+      update_row(works, reason, ac_info)
+
+      if (works == false) {
+        var phone = ac_info.phone
+        var selector = $(`tr[phone="${phone}"]`)
+        selector.addClass('account_not_works')
+        selector.find('td').addClass('warning')
+        if (reason == 'UserDeactivatedError' || reason == 'AuthKeyUnregisteredError') {
+          var current = parseInt($('#delete_banned span').html())
+          $('#delete_banned span').html(current+1)
+          $('#delete_banned').removeClass('disabledb')
+          selector.find('td.check_status').html('<i title="Аккаунт забанен" data-rel="tooltip" class="icon-trash not_works"></i>')
+          selector.addClass('account_banned')
+          $('#t_banned').html(parseInt($('#t_banned').html()) + 1)
+        }
+        if (reason == 'ConnectionError' || reason == 'Exception' || reason == 'TimeoutError') {
+          var tlt = 'Ошибка подключения'
+          if (reason == 'TimeoutError') {
+            tlt = 'Таймаут подключения'
+          }
+          selector.find('td.check_status').html(`<i title="${tlt}" data-rel="tooltip" class="icon-warning-sign con_error"></i>`)
+          $('#t_errors').html(parseInt($('#t_errors').html()) + 1)
+        }
+      } else {
+        var phone = ac_info.phone
+        var selector = $(`tr[phone="${phone}"]`)
+        selector.addClass('account_works')
+        var is_spam = '';
+        if ('spamblock' in ac_info && ac_info.spamblock) {
+          is_spam = '<i title="Спамблок" data-rel="tooltip" class="icon-umbrella spamblock"></i>';
+          selector.addClass('account_spamblock')
+        } 
+        selector.find('td.check_status').html('<i title="Аккаунт работает" data-rel="tooltip" class="icon-ok works"></i>' + is_spam)
+      }
+
+      $('#t_checked').html(parseInt($('#t_checked').html()) + 1)
+      $('#t_need_check').html(parseInt($('#t_need_check').html()) - 1)
+    } 
+    
+
+    function set_account_bio_process(data) {
+      var works = data.works
+      var ac_info = data.info
+      var reason = data.reason
+
+      if (data.bio_set) {
+        update_row(works, reason, ac_info)
+      } else {
+        red_log('Не удалось установить BIO');
+      }
+
+      if (works == false) {
+        var phone = ac_info.phone
+        var selector = $(`tr[phone="${phone}"]`)
+        selector.addClass('account_not_works')
+        selector.find('td').addClass('warning')
+        if (reason == 'UserDeactivatedError' || reason == 'AuthKeyUnregisteredError') {
+          var current = parseInt($('#delete_banned span').html())
+          $('#delete_banned span').html(current+1)
+          $('#delete_banned').removeClass('disabledb')
+          selector.find('td.check_status').html('<i title="Аккаунт забанен" data-rel="tooltip" class="icon-trash not_works"></i>')
+          selector.addClass('account_banned')
+          $('#t_banned').html(parseInt($('#t_banned').html()) + 1)
+        }
+        if (reason == 'ConnectionError' || reason == 'Exception' || reason == 'TimeoutError') {
+          var tlt = 'Ошибка подключения'
+          if (reason == 'TimeoutError') {
+            tlt = 'Таймаут подключения'
+          }
+          selector.find('td.check_status').html(`<i title="${tlt}" data-rel="tooltip" class="icon-warning-sign con_error"></i>`)
+          $('#t_errors').html(parseInt($('#t_errors').html()) + 1)
+        }
+      }
+
+      $('#t_checked').html(parseInt($('#t_checked').html()) + 1)
+      $('#t_need_check').html(parseInt($('#t_need_check').html()) - 1)
+    } 
+
+
+    function phone_to_hash(phone) {
+      return phone.replace(/[ \+|\-|\)|\(]/g , '')
+    }
+
+
+    function on_check_end() {
+        var ctime = new Date().getTime() / 1000;
+        var inseconds = ctime - start_check_time;
+        var secs = parseInt(inseconds) + ' секунд'
+
+        green_log('Проверка завершилась и заняла ' + secs);
+
+        $('.check_accounts_progress').removeClass('dshow');
+        $('#check_accounts .progress_button').hide()
+
+        $('.mall').html(accounts_info.length)
+        $('.mban').html($('#delete_banned span').html())
+        $('.merr').html($('#t_errors').html())
+        $('.mcheck').html($('#t_checked').html())
+
+
+        $('.mrec').html($('#delete_banned span').html())
+        
+        $('.mmore_than_day').html(accounts_info.more_than_day)
+        $('.mmore_than_month').html(accounts_info.more_than_month)
+        $('.mmore_than_week').html(accounts_info.more_than_week)
+        $('.mnow').html(accounts_info.now)
+        $('.mtemp_length').html(accounts_info.temp_length)
+
+
+        let without_usernames = $('td[class="username"]').find('span').length
+        let all_td_usernames = $('td[class="username"]').length
+
+        $('.musernames').html(all_td_usernames-without_usernames)
+
+        $('.mava').html($('td > .with_avatar').length)
+        $('.mbio').html($('td > .with_bio').length)
+        $('.mtfa').html($('td > .twofa').length)
+
+        var spam_len = $('.account_spamblock').length
+        $('.mspam').html(spam_len)
+        $('.mtimes').html(secs)
+        if (spam_len > 0) {
+          $('.move_archive_icon').removeClass('dn');
+        } else {
+          $('.move_archive_icon').addClass('dn');
+        }
+
+        $('#report_modal').show();
+    }
+
+    $('.move_archive_icon').click(function() {
+      var result = []
+      var sels = $('tr.account_spamblock')
+      for (var i = 0; i < sels.length; i++) {
+        var acc = $(sels[i])
+        result.push(acc.attr('phone'))
+      }
+      if (result.length > 0) {
+        loading_start()
+        ws_send({type: 'to_archive', data: result});
+      }
+    })
+
+
+    function from_archive_completed(data) {
+      green_log('Восстановили аккаунты из архива');
+
+      if (data.errors > 0) {
+        red_log('В процессе произошло ' + data.errors + ' ошибок');
+      }
+
+      reload()
+    }
+    function to_archive_completed(data) {
+      green_log('Перенесли аккаунты в архив');
+      if (data.errors > 0) {
+        red_log('В процессе произошло ' + data.errors + ' ошибок');
+      }
+      reload()
+    }
+
+    function reload() {
+      var CURRENT_PAGE = GetURLParameter('p')
+      $('#main_menu').load('menu.html')
+      $("#content").load(CURRENT_PAGE + ".html"); 
+      $('.main-menu a').on('click', function(e) { e.preventDefault() })
+    }
+
+
+    
+    $(document).ready(function() {
+      WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+      WS.onopen = function() {
+          loading_stop()
+          
+          ws_send({type: 'get_accounts'});
+          ws_send({type: 'full_account_info'});
+      };
+      WS.onclose = function(event) {
+        loading_start()
+        red_log('Соединение с сервером потеряно');
+      };
+      WS.onmessage = function (evt) {
+        var data = JSON.parse(evt.data)
+        var f_data = data.data
+
+        ws_defs(evt);
+
+        if (data.type == 'account_info') {
+          $( ".sliderRangeAccountsCheck" ).slider({
+            range: true,
+            min: 1,
+            max: accounts_info.length,
+            values: [1, accounts_info.length],
+            slide: function( event, ui ) {
+              $( ".sliderRangeLabel" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ]);
+              $('.sliderRangeAccountsCheck').removeClass('opacity03')
+              unsetActives();
+              selectByIndex(ui.values[0], ui.values[1])
+              var accs = getActiveAccounts()
+              if (accs.length > 0) {
+                $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+                $('.sliderRangeAccountsCheck').addClass('opacity03')
+              } else {
+                $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+                $('.sliderRangeAccountsCheck').removeClass('opacity03')
+              }
+            }
+          });
+
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+        }
+
+
+        if (data.type == 'full_account_info') {
+          set_full_account_info(f_data)
+        }
+        if (data.type == 'account_checked') set_account_checked(f_data)
+        if (data.type == 'check_end') on_check_end()
+        if (data.type == 'delete_end') reload()
+        if (data.type == 'data_set') set_account_data_process(f_data)
+
+        if (data.type == 'wait_code_cb_success') wait_code_cb_success(f_data)
+
+        if (data.type == 'bio_set') set_account_bio_process(f_data)
+        if (data.type == 'bio_end') {
+          loading_stop();
+          green_log('Закончили работу с описаниями');
+          $('#set_account_bio .progress_button').hide()
+          unsetActives();
+        }
+
+        if (data.type == 'username_end') {
+          loading_stop();
+          green_log('Закончили работу с юзернеймами');
+          $('#set_account_username .progress_button').hide()
+          unsetActives();
+        }
+
+        if (data.type == 'name_end') {
+          loading_stop();
+          green_log('Закончили работу с именами');
+          $('#set_account_names .progress_button').hide()
+          unsetActives();
+        }
+
+        if (data.type == 'clear_sessions_end') {
+          loading_stop();
+          green_log('Закончили работу с деактивацией сессий');
+          $('#ws_set_account_fa .progress_button').hide()
+          unsetActives();
+        }        
+        if (data.type == 'unsubscribe_all_end') {
+          loading_stop();
+          green_log('Закончили работу с отписками');
+          $('#ws_set_account_fa .progress_button').hide()
+          unsetActives();
+        }        
+        if (data.type == 'set_account_fa_end') {
+          loading_stop();
+          green_log('Закончили работу с 2fa');
+          $('#ws_set_account_fa .progress_button').hide()
+          unsetActives();
+        }
+        
+
+        if (data.type == 'avatar_end') {
+          loading_stop();
+          green_log('Закончили работу с аватарами');
+          $('#set_account_two_avatars .progress_button').hide()
+          unsetActives();
+        }
+
+        if (data.type == 'from_archive_completed') from_archive_completed(f_data)
+        if (data.type == 'to_archive_completed') to_archive_completed(f_data)
+      };
+
+      
+    })
+
+    window.onbeforeunload = function() {
+        WS.onclose = function () {};
+        WS.close();
+    };
+
+
+    function open_modal(_id) {
+      $('#' + _id).addClass('open');
+      return new Promise((resolve, reject) => {
+        $('#' + _id  + ' button').click(function() {
+          close_modal(_id)
+          resolve($(this))
+        })
+        $('#' + _id  + ' .btn-close').click(function() {
+          close_modal(_id)
+          resolve(null)
+        })
+      })  
+    }
+
+
+    
+    function open_buttons_modal() {
+      let _id = 'modal_open_buttons';
+      var accs = getActiveAccounts()
+      $('.how_accs').html(accs.length);
+
+      $('#' + _id).addClass('open');
+      $('#' + _id  + ' button').click(function() {
+        close_modal(_id)
+      })
+    }
+
+    $('#modal_open_buttons').click(function(e) {
+      if (e.target.id == 'modal_open_buttons') {
+        close_modal(e.target.id)
+      }
+    })
+
+    $('.open_buttons').click(function() {
+      open_buttons_modal();
+    })
+
+    function open_input_modal(_id) {
+      $('#' + _id).addClass('open');
+      return new Promise((resolve, reject) => {
+        $('#' + _id  + ' button').click(function() {
+          var txt = $(this).attr('input')
+          close_modal(_id)
+          resolve($(txt).val())
+        })
+        $('#' + _id  + ' .btn-close').click(function() {
+          close_modal(_id)
+          resolve(null)
+        })
+      })  
+    }
+    function close_modal(_id) {
+      $('#' + _id).removeClass('open');
+    }
+
+</script>

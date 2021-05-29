@@ -1,0 +1,610 @@
+<div class="row-fluid">
+	<div class="box span12">
+		<div class="box-header" data-original-title>
+			<h2>Настройки</h2>
+		</div>
+		<div class="box-content settings">
+			<div class="control-group">
+				<div class="head_settings">Основные</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Разбавлять активность</span></label>
+				<div class="controls">
+					<select id='random_activity'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class='settings-label'><span>Использовать прокси</span></label>
+				<div class="controls">
+					<select id='use_proxy'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Количество потоков</span></label>
+				<div class="controls">
+					 <input id='threads' type="number" min="1" step="1" />
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Язык интерфейса</span></label>
+				<div class="controls">
+					<select id='language'>
+						
+					  <option class='russian'>Русский</option>
+					  <option class='english'>Английский</option>
+				    </select>
+				</div>
+			</div>
+
+
+		<!-- 	<div class="control-group">
+				<div class="head_settings">Инвайтинг в группы</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Инвайтить за раз</span></label>
+				<div class="controls">
+					 <input id='how_many_usernames_to_add_at_time_group' type="number" min="1" step="1"/> <span class="pl5">пользователей</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Задержка между добавлениями</span></label>
+				<div class="controls">
+					 <input id='delay_between_additions_in_seconds_group'  type="number" min="1" step="1" value="10"/> <span class="pl5">секунд</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Задержка между подготовкой пользователей</span></label>
+				<div class="controls">
+					 <input id='delay_between_prepare_users_in_seconds_group'  type="number" min="1" step="1"/> <span class="pl5">секунд</span>
+				</div>
+			</div>
+ -->
+			
+			<div class="va50"></div>
+			<div class="clearfix"></div> 
+
+		
+			<div class="control-group">
+				<div class="head_settings">Настройки аккаунта</div>
+			</div>
+
+			
+			<div class="control-group">
+				<label class='settings-label'><span>Генерировать имена на языке</span></label>
+				<div class="controls">
+					<select id='names_language'>
+						
+					  <option class='russian'>Русский</option>
+					  <option class='english'>Английский</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Проверять прокси перед использованием</span></label>
+				<div class="controls">
+					<select id='check_proxy_before_start'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Не использовать привязанные прокси к аккаунтам</span></label>
+				<div class="controls">
+					<select id='dont_use_accounts_proxy'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class='settings-label'><span>Устанавливать случайные аватары</span></label>
+				<div class="controls">
+					<select id='set_avatars'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Генерировать username</span></label>
+				<div class="controls">
+					<select id='generate_username'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Ставить 2fa-пароль</span></label>
+				<div class="controls">
+					<select id='set_two_fa'>
+					  <option class='yes'>Включено</option>
+					  <option class='no'>Отключено</option>
+				    </select>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>2fa-пароль по-умолчанию</span></label>
+				<div class="controls">
+					<input id='two_fa_default_password' size="16" type="text">
+				</div>
+			</div>
+
+
+			<div class="va50"></div>
+			<div class="clearfix"></div> 
+
+			<div class="control-group">
+				<div class="head_settings">SMS-сервисы</div>
+			</div>
+			<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>simsms.org</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='simsms_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+			<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>sms-activate.ru</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='smsactivate_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>5sim.net</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='5sim_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>sms-online.pro</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='sms_online_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>cheapsms.ru</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='cheapsms_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>sms-acktiwator.ru</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='sms_acktiwator_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>vr-sms.pro</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='vrsms_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>smsvk.net</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='smsvk_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>smska.net</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='smska_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>API-ключ <b>smshub.org</b></span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='sms_hub_api_key' size="16" type="text">
+					<button class="btn btn-input btn-success check_balance" type="button">Проверить</button>
+					<span class='bal'></span>
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="va50"></div>
+			<div class="clearfix"></div> 
+
+			<div class="control-group">
+				<div class="head_settings">Прочее</div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>Таймаут подключения к аккаунту</span></label>
+				<div class="controls">
+					 <input id='default_timeout' type="number" min="10" step="1" />
+				</div>
+			</div>
+
+<!-- 			<div class="control-group">
+				<label class='settings-label'><span>Задержка в рассылке сообщений</span></label>
+				<div class="controls">
+					 <input id='send_msg_sleep' type="number" min="1" step="1" />
+				</div>
+			</div> -->
+
+
+			<div class="va50"></div>
+			<div class="clearfix"></div> 
+
+			<div class="control-group">
+				<div class="head_settings">Собственный api_id <a class="small_link" href="https://my.telegram.org" target="_blank">(my.telegram.org)</a></div>
+			</div>
+
+			<div class="control-group">
+				<label class='settings-label'><span>api_id</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_app_id' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>api_hash</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_app_hash' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>device</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_device' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>system_version</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_system_version' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>app_version</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_app_version' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+		  	<div class="control-group">
+				<label class='settings-label'><span>lang_pack</span></label>
+				<div class="controls">
+				  <div class="input-append">
+					<input id='user_lang_pack' size="16" type="text">
+				  </div>
+				</div>
+		  	</div>
+
+			<button id="save" class="btn btn-primary">Сохранить</button>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.settings-label {
+	    min-width: 450px;
+	}
+</style>
+
+<script>
+	$('.check_balance').click(function() {
+		ws_send({type: 'check_balance', data: {
+			'service': $(this).parent().find('input').attr('id'),
+			'api_key': $(this).parent().find('input').val()
+		}});
+	});
+
+  function balance_data(data) {
+  	var s_name = $('#' + data['service']).parent().parent().parent().find('label').html()
+
+  	if (data['working'] == false) {
+	  $.gritter.add({
+        title: 'Произошла ошибка',
+        text: s_name + ' НЕ РАБОТАЕТ. Возможно указан неверный ключ'
+      });
+      $('#' + data['service']).css({'background': '#ffb7b7'})
+      return
+  	}
+
+  	$('#' + data['service']).css({'background': 'white'})
+  	 $.gritter.add({
+	    title: 'Отлично',
+	    text: s_name + ' работает. На вашем счету ' + data['balance'] + ' рублей'
+	  });
+  	 $('#' + data['service']).parent().find('span').html('('+data['balance'] + ' рублей)')
+  }
+  function safe_get_data(data, key) {
+  	if (typeof data[key] != 'undefined' && data[key] != null) {
+  		return data[key]
+  	}
+  	return ''
+  }
+
+  function set_false(selector) {
+  	selector.val(selector.find('.no').html())
+  }
+
+  function set_true(selector) {
+  	selector.val(selector.find('.yes').html())
+  }
+
+  function int_is_true(val) {
+  	if (val == '1' || val == 1) {
+  		return true;
+  	}
+  	return false;
+  }
+
+
+
+  function set_settings_info(data) {
+  	console.log(data)
+  	var sms_services = [
+	  	'5sim_api_key', 
+	  	'cheapsms_api_key', 
+	  	'simsms_api_key', 
+	  	'sms_acktiwator_api_key', 
+	  	'sms_online_api_key', 
+	  	'smsactivate_api_key', 
+	  	'vrsms_api_key',
+	  	'smsvk_api_key',
+	  	'smska_api_key',
+	  	'sms_hub_api_key'
+  	]
+  	var integer_values = [
+  		'delay_between_additions_in_seconds_group',
+  		'delay_between_prepare_users_in_seconds_group',
+  		'how_many_usernames_to_add_at_time_group',
+  		'threads',
+  		'default_timeout',
+  		'send_msg_sleep'
+	]
+
+	var bool_values = [
+		'generate_username',
+		'random_activity',
+		'set_avatars',
+		'check_proxy_before_start',
+		'dont_use_accounts_proxy',
+		'use_proxy',
+		'set_two_fa'
+	]
+
+	var string_values = [
+		'user_app_id',
+		'user_app_hash',
+		'user_device',
+		'user_system_version',
+		'user_app_version',
+		'user_lang_pack',
+		'two_fa_default_password'
+	]
+
+  	for (var i in integer_values) {
+  		$('#' + integer_values[i]).val(safe_get_data(data, integer_values[i]))
+  	}
+
+  	for (var i in string_values) {
+  		$('#' + string_values[i]).val(safe_get_data(data, string_values[i]))
+  	}
+
+  	for (var i in sms_services) {
+  		$('#' + sms_services[i]).val(safe_get_data(data, sms_services[i]))
+  	}
+
+  	for (var i in bool_values) {
+  		var selector = $('#' + bool_values[i])
+  		var b = safe_get_data(data, bool_values[i])
+  		if (int_is_true(b)) {
+  			set_true(selector)
+  		} else {
+  			set_false(selector)
+  		}
+  	}
+
+  	if (safe_get_data(data, 'language') == 'ru') {
+  		$('#language').val($('#language').find('.russian').val())
+  	}
+  	if (safe_get_data(data, 'language') == 'en') {
+  		$('#language').val($('#language').find('.english').val())
+  	}
+
+  	if (safe_get_data(data, 'names_language') == 'russia') {
+  		$('#names_language').val($('#names_language').find('.russian').val())
+  	}
+  	if (safe_get_data(data, 'names_language') == 'english') {
+  		$('#names_language').val($('#names_language').find('.english').val())
+  	}
+  	
+  }
+
+  $('#save').click(function() {
+  	var data = {}
+
+  	var sms_services = [
+	  	'5sim_api_key', 
+	  	'cheapsms_api_key', 
+	  	'simsms_api_key', 
+	  	'sms_acktiwator_api_key', 
+	  	'sms_online_api_key', 
+	  	'smsactivate_api_key', 
+	  	'vrsms_api_key',
+	  	'smsvk_api_key',
+	  	'smska_api_key',
+	  	'sms_hub_api_key'
+  	]
+  	var integer_values = [
+  		'delay_between_additions_in_seconds_group',
+  		'delay_between_prepare_users_in_seconds_group',
+  		'how_many_usernames_to_add_at_time_group',
+  		'threads',
+  		'default_timeout',
+  		'send_msg_sleep'
+	]
+
+	var bool_values = [
+		'generate_username',
+		'random_activity',
+		'set_avatars',
+		'check_proxy_before_start',
+		'dont_use_accounts_proxy',
+		'use_proxy',
+		'set_two_fa'
+	]
+
+	var string_values = [
+		'user_app_id',
+		'user_app_hash',
+		'user_device',
+		'user_system_version',
+		'user_app_version',
+		'user_lang_pack',
+		'two_fa_default_password'
+	]
+
+
+	for (var i in string_values) {
+  		data[string_values[i]] = $('#' + string_values[i]).val()
+  	}
+  	
+	for (var i in integer_values) {
+  		data[integer_values[i]] = $('#' + integer_values[i]).val()
+  	}
+
+  	for (var i in sms_services) {
+  		data[sms_services[i]] = $('#' + sms_services[i]).val()
+  	}
+
+  	for (var i in bool_values) {
+  		var b = '1'
+  		if ($('#' + bool_values[i]).val() == $('#' + bool_values[i]).find('.yes').val()) {
+  			b = '1'
+  		} else {
+  			b = '0'
+  		}
+  		data[bool_values[i]] = b
+  	}
+
+
+
+  	if ($('#language').val() == $('#language').find('.russian').val()) {
+  		data['language'] = 'ru'
+  	}
+  	if ($('#language').val() == $('#language').find('.english').val()) {
+  		data['language'] = 'en'
+  	}
+
+
+  	if ($('#names_language').val() == $('#names_language').find('.russian').val()) {
+  		data['names_language'] = 'russia'
+  	}
+  	if ($('#names_language').val() == $('#names_language').find('.english').val()) {
+  		data['names_language'] = 'english'
+  	}
+  	console.log(data)
+  	ws_send({type: 'set_settings', data: data});
+  })
+
+  $(document).ready(function() {
+	WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+	  
+    WS.onopen = function() {
+    	loading_stop()
+        ws_send({type: 'get_settings'});
+        ws_send({type: 'get_accounts'});
+    };
+	WS.onclose = function(event) {
+        loading_start()
+        red_log('Соединение с сервером потеряно');
+    };
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+
+      ws_defs(evt);
+  
+      if (data.type == 'all_settings') set_settings_info(f_data)
+  	  if (data.type == 'balance_data') balance_data(f_data)
+  	  if (data.type == 'settings_end') {
+  	  	  $.gritter.add({
+	        title: 'Завершено',
+	        text: 'Настройки успешно сохранены'
+	      });
+  	  }
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

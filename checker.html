@@ -1,0 +1,202 @@
+<style>
+.checker_content {
+    height: calc(100vh - 235px);
+    min-height: 400px;
+}
+.checker_content_box {
+  height: calc(100% - 35px); 
+  box-sizing: border-box;
+}
+.checker_phones {
+  height: 100%;
+}
+.checker_buttons {
+  position: absolute;
+  bottom: 0px;
+}
+</style>
+
+<div class="row-fluid">
+  <div class="box span12">
+    <div class="box-header" data-original-title="">
+      <h2>Настройки</h2>
+    </div>
+    <div class="box-content">
+      <div class="alert alert-success">
+        Данный чеккер проверяет телефоны на факт регистрации в Telegram. Аккаунты для работы не требуются. Требуются только прокси.
+      </div>
+      <div class="control-group">
+        <label class="settings-label"><span>Количество потоков</span></label>
+        <div class="controls">
+           <input class="small_input" style="margin-bottom: 0;" save="yes" id="threads" value="10" type="number" min="1" step="1"> <i class="icon-exclamation-sign" data-original-title="Влияет на скорость работы. Может иметь зависимость от количества активных прокси" data-rel="tooltip"></i>
+        </div>
+      </div>
+    </div>  
+  </div>
+</div>
+
+<div class="row-fluid checker_content">   
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Контакты</h2>
+    </div>
+    <div class="box-content checker_content_box">
+      <div class="control-group" style="height: calc(100% - 60px);">
+        <label class="control-label count_phones">Список телефонов <span>(0)</span></label>
+        <div class="controls" style="height: calc(100% - 30px);">
+          <textarea class="groups checker_phones" placeholder="Введите список телефонных номеров, каждый с новой строки"></textarea>
+        </div>
+        <div class="control-group checker_buttons" style="padding-bottom: 10px;">
+          <button id="start_checker" class="btn btn-small btn-success" style="font-size: 14px;">Начать</button> 
+          <button id="save_phones" class="btn btn-small btn-primary" style="font-size: 14px;">Сохранить результат (0)</button> 
+        </div> 
+      </div>      
+    </div>
+  </div>
+
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Лог работы</h2>
+    </div>
+    <div class="box-content" style="height: calc(100% - 56px);">
+      <div class="log-content" style="height: 100%;max-height: 100%;">  
+          <ul id="log"></ul>
+      </div>
+    </div>   
+  </div>
+</div>
+
+
+<script>
+  var _phones = [];
+
+  $(".checker_phones").on('change keyup paste', function() {
+      var checker_phones = $('.checker_phones').val();
+      checker_phones = checker_phones.split('\n').filter(function (el) {
+        return el != null && el.trim() != '';
+      });
+      $('.count_phones span').html(`(${checker_phones.length})`);
+  });
+
+  $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom",delay: { show: 400, hide: 200 }});
+
+  function unique(a) {
+        return a.sort().filter(function(value, index, array) {
+            return (index === 0) || (value !== array[index-1]);
+        });
+    }
+
+  function unique_list(a) {
+    let tmp_list = [];
+    let tmp_ids = [];
+
+    for (let i of _all_info) {
+      let [id, phone, username] = i
+      if (tmp_ids.indexOf(id) == -1) {
+        tmp_ids.push(id);
+        tmp_list.push(i);
+      }
+    }
+
+    return tmp_list
+  }
+
+  $(document).ready(function() {
+    $('#start_checker').on('click', function() {
+      var checker_phones = $('textarea').val();
+      checker_phones = checker_phones.split('\n').filter(function (el) {
+        return el != null && el.trim() != '';
+      });
+
+      var len_phones = checker_phones.length
+      checker_phones = checker_phones.join('\n')
+      if (checker_phones.length == 0) {
+        $.gritter.add({
+          title: 'Запуск невозможен',
+          text: 'Чтобы начать проверку телефонов необходимо добавить как минимум один номер телефона'
+        });
+        return;
+      }
+
+      var data = {
+        type: 'checker3_start',
+        data: {
+          phones: checker_phones,
+          threads: $('#threads').val()
+        }
+      }
+
+      $("#log").html('')
+
+      _phones = []
+
+      log('Запускаем проверку телефонов');
+      log('')
+      log(`Будет проверено <b>${len_phones}</b> телефонов`)
+
+      ws_send(data);
+    });
+    
+    $('#save_phones').click(() => {
+        if (_phones.length == 0) {
+          $.gritter.add({
+            title: 'Нечего сохранять',
+            text: 'Вы ещё не проверили ни одного пользователя'
+          });
+          return
+        }
+
+        text = ''
+        for (user in _phones) {
+          text += _phones[user] + '\r\n'
+        }
+
+        var textFile = new Blob([text], {type: 'text/plain'});
+        invokeSaveAsDialog(textFile, 'phones.txt');
+    })
+
+
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop();
+        ws_send({type: 'get_accounts'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+
+      ws_defs(evt);
+
+      if (data.type == 'checker_process') {
+        if (f_data.registred) {
+          log(`<span class="green_info">Телефон (${f_data.idx}/${f_data.len_all}) зарегистрирован кем-то: ${f_data.phone}</span>`);
+          _phones.push(f_data.phone);
+        } else {
+          log(`<span class="blue_info">Телефон (${f_data.idx}/${f_data.len_all}) не найден: ${f_data.phone}</span>`);
+        }
+
+        $('#save_phones').html(`Сохранить результат (${_phones.length})`);
+      }     
+
+      if (data.type == 'checker_end') {
+        log('')
+        log('<span class="green_info">Проверка телефонов окончена</span>')
+      }
+
+
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

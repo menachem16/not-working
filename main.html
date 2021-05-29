@@ -1,0 +1,99 @@
+<style>
+  #content {
+    background: url(img/bg-login.jpg) !important;
+  }
+</style>
+
+<div class="row-fluid">
+  <div class="row-fluid">
+    <div class="login-box">
+      <div class="mb30"></div>
+      <h2>Введите ключ активации</h2>
+      <form class="form-horizontal" action="index.html" method="post">
+        <fieldset>
+          <div class="input-prepend">
+            <span class="add-on"><i class="halflings-icon lock i-key"></i></span>
+            <input class="input-large span10" name="key" id="key" type="text" placeholder="ключ активации">
+          </div>
+          <div class="clearfix"></div>
+          <div class="button-login">  
+            <button class="btn btn-primary" id='activate'>ОК</button>
+          </div>
+          <div class="clearfix"></div>           
+          <div class="last_key_exist" style="display: none;">
+            <hr>
+            <h3>Похоже вы уже были активированы ранее</h3>
+            <h3>Ваш старый ключ активации: <span id='last_key'></span></h3> 
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#activate').click(function(e) {
+    e.preventDefault();
+    let key = $('#key').val();
+
+    if (key.length < 5) {
+      red_log('Слишком короткий ключ активации');
+      return;
+    }
+
+    ws_send({type: 'activate', data: {
+      code: key
+    }});
+  });
+
+  function is_activated_cb(data) {
+    if (data.key != null) {
+      $('#last_key').html(data.key);
+      $('.last_key_exist').show();
+    }
+  }
+
+  $(document).ready(function() {
+
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop()
+        green_log('Соединение с сервером установлено');
+        ws_send({type: 'ws_is_activated'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+
+      console.log(data)
+      
+      if (data.type == 'error_handle') open_global_modal(f_data.ex_value, f_data.ex_traceback)
+
+      if (data.type == 'is_activated_cb') is_activated_cb(f_data)
+      if (data.type == 'activation_success') {
+        green_log(f_data.reason)
+        setTimeout(function() {
+          location.reload()
+        }, 2000)
+      }
+
+      if (data.type == 'activation_error') {
+        red_log(f_data.reason)
+      }
+
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

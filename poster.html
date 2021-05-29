@@ -1,0 +1,610 @@
+
+<div class="row-fluid">
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Настройки</h2>
+    </div>
+
+    <div class="box-content">
+      <form class="form-horizontal" style="margin: 0;">
+
+        <div class="control-group">
+          <div class="head_settings">Постинг истории</div>
+        </div>
+
+        <div class="control-group">
+          <label class='settings-label'><span>Адрес группы</span></label>
+          <div class="controls fz">
+             <input id='to_group' type="text" />
+          </div>
+        </div>
+
+  
+        <div class="control-group">
+          <label class='settings-label'><span>Файл истории</span></label>
+          <div class="controls">
+            <select id='choose_history'></select>
+              <i id='choose_history_redraw' class="icon-repeat" data-original-title="Обновить" data-rel="tooltip" style="margin-top: -9px;margin-left: 9px;cursor: pointer;"></i>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Добавить дополнительно</span></label>
+          <div class="controls">
+             <input id="add_sleep" value="0" type="number" min="-1000" step="1">  часов</i> </span>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>Выбрано пользователей</span></label>
+          <div class="controls select_users_div_control">
+             <div class='select_users_div'><span id="selected_users">0</span> из <span id="need_select_users">0</span> необходимых</div> <i class="icon-user select_users_i"></i></span>
+          </div>
+        </div>
+
+
+        <div class="control-group">
+          <label class="settings-label"><span>Подготовка пользователей</span></label>
+          <div class="controls">
+             <select id='prepare_users_time'>
+              <option value='at_startup'>Перед запуском</option>
+              <option value='in_process'>По необходимости</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="settings-label"><span>Задержка между сообщениями</span></label>
+          <div class="controls">
+             <select id='fixed_sleep'>
+              <option value='original'>Как в оригинале</option>
+              <option value='manual'>Своя</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="settings-label"><span>Собственная задержка</span></label>
+          <div class="controls">
+             <input id="prepare_users_time_manual" class='dis' value="10" type="number" min="1" step="1" style="margin-right:7px;width:75px;">  секунд</span>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <hr style="margin: 7px;">
+        </div>
+
+        <div class="control-group">
+          <label class='settings-label'><span>Удалять сервисные сообщения</span></label>
+          <div class="controls delete_service_messages_div dis">
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" checked="checked" class="delete_service_messages" value="1" name="delete_service_messages">
+                <span>Да</span>
+              </label>
+            </div>
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" class="delete_service_messages" value="0" name="delete_service_messages">
+                <span>Нет</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class='settings-label'><span>Запретить писать в группу</span></label>
+          <div class="controls disable_write_group dis">
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" class="disable_write_group" value="1" name="disable_write_group">
+                <span>Да</span>
+              </label>
+            </div>
+            <div class="inline_list lh30 pr20">
+              <label class="radio vam">
+                <input type="radio" checked="checked" class="disable_write_group" value="0" name="disable_write_group">
+                <span>Нет</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button id="start_posting" class="btn button-large btn-success">Начать</button>
+
+        <button id="normalize_history" class="btn button-large btn-info">Нормализация</button>
+
+        <button id="create_admin_bot" class="btn button-large btn-warning dis">Создать админ-бота</button>
+      </form>
+    </div>   
+  </div>
+
+<script>
+  var HISTORY = null;
+  var USERS = [];
+  var CURRENT_DR = null;
+  var SELECTED_USERS = [];
+  var ALREADY_RESERVED_ACCS = 0;
+  
+  $('#fixed_sleep').change(function() {
+    if ($(this).val() == 'manual') {
+      $('#prepare_users_time_manual').removeClass('dis')
+    } else {
+      $('#prepare_users_time_manual').addClass('dis')
+    }
+  })
+
+  $('#normalize_history').click(function(e) {
+    e.preventDefault();
+    if (CURRENT_DR == null) {
+      red_log('Не выбран файл истории')
+      return 
+    }
+    ws_send({type: 'normalize_history_users', data: {
+      dr: CURRENT_DR
+    }});
+  });
+
+  $('#start_posting').click(function(e) {
+    e.preventDefault();
+
+    let prepare = $('#prepare_users_time').val();
+    let to_group = $('#to_group').val();
+    let sl_time = 0;
+
+    if ($('#fixed_sleep').val() == 'manual') {
+      sl_time = $('#prepare_users_time_manual').val();
+    }
+
+    if (to_group.length <= 3 && to_group != '!') {
+      red_log('Не указана группа')
+      return
+    }
+    if (CURRENT_DR == null) {
+      red_log('Не выбран файл истории')
+      return 
+    }
+
+    var delete_service_messages = $('input[class=delete_service_messages]:checked').val();
+    var disable_write_group = $('input[class=disable_write_group]:checked').val();
+
+    ws_send({type: 'start_history_posting', data: {
+      to_group: to_group,
+      dr: CURRENT_DR,
+      prepare_time: prepare,
+      users: SELECTED_USERS,
+      fixed_sleep: sl_time,
+      delete_service_messages: delete_service_messages,
+      disable_write_group: disable_write_group
+    }});
+
+
+  });
+
+  $('.select_users_i').click(function() {
+    open_account_chooser().then(function(users) {
+      SELECTED_USERS = users;
+      update_selected_users();
+      if (SELECTED_USERS.length + ALREADY_RESERVED_ACCS >= USERS.length) {
+        log(`Выбрано <b>${USERS.length + ALREADY_RESERVED_ACCS}</b> пользователей. В резерве: <b>${SELECTED_USERS.length-USERS.length+ALREADY_RESERVED_ACCS}</b>`)
+      } else {
+        log(`Выбрано недостаточно пользователей`)
+      }
+    })
+  });
+
+  function update_selected_users() {
+    $('.select_users_div_control').css({'opacity': '1.0'})
+    $('.select_users_div_control').css({'pointer-events': 'all'})
+
+    $('#need_select_users').html(USERS.length);
+    $('#selected_users').html(SELECTED_USERS.length + ALREADY_RESERVED_ACCS);
+
+    if (USERS.length > SELECTED_USERS.length + ALREADY_RESERVED_ACCS) {
+      $('.select_users_div_control').css({'color': '#f32929'});
+      $('#start_posting').css({'opacity': '0.3'})
+      $('#start_posting').css({'pointer-events': 'none'})
+    } else {
+      $('#start_posting').css({'opacity': '1.0'})
+      $('#start_posting').css({'pointer-events': 'all'})
+      $('.select_users_div_control').css({'color': 'black'});
+    }
+  }
+
+  function normalize_history_users_end(data) {
+    let users_file = `history_exported/${CURRENT_DR}/users.json`;
+
+    $.getJSON(users_file, function(_users) {
+      USERS = [];
+      for (let ln of _users) {
+        USERS.push(ln)
+      }
+      update_selected_users();
+    });
+
+    log(`Нормализация и перерасчет пользователей завершены`);
+  }
+
+  function already_have_history_accounts_cb(data) {
+    ALREADY_RESERVED_ACCS = data.prepared + data.not_prepared
+    if (data.prepared > 0) {
+      log(`Для данной базы уже есть ${data.prepared} подготовленных аккаунтов`)
+      log(`И ${data.not_prepared} резервных аккаунтов`)
+    } else if (data.not_prepared > 0) {
+      log(`Для данной базы уже есть ${data.not_prepared} резервных аккаунтов`)
+    } else {
+      log(`История чистая, у вас нет подготовленных аккаунтов`)
+    }
+    update_selected_users()
+  }
+
+  $('.add_manual_sleep').click(function() {
+    let hours = $('#add_sleep').val();
+    if (HISTORY == null || hours == 0) {
+      return;
+    }
+    
+    let len = HISTORY.length;
+    let add_to_one = hours * 60 * 60 / len;
+
+    ws_send({type: 'update_history_messages_offset', data: {
+      add_to_one: add_to_one,
+      dr: CURRENT_DR
+    }});
+  });
+
+  $('#choose_history_redraw').click(function() {
+    ws_send({type: 'get_files_history'});
+  });
+
+  function get_files_history_pages_cb(data) {
+    let basePath = 'history_exported/' + data.dr + '/';
+    log(`Для этой истории обнаружено <b>${data.pages.length}</b> страниц`)
+  }
+
+  function print_info() {
+    let users_file = `history_exported/${CURRENT_DR}/users.json`;
+    let info_file = `history_exported/${CURRENT_DR}/info.json`;
+    let cache_ids = `history_exported/${CURRENT_DR}/cache_ids.json`;
+
+    $.getJSON(users_file, function(_users) {
+      USERS = [];
+      for (let ln of _users) {
+        USERS.push(ln)
+      }
+      update_selected_users();
+    })
+
+    $.getJSON(cache_ids, function(cache) {
+      let cache_num = 0;
+      for (let ln of cache) {
+        cache_num += 1;
+      }
+      log(`Количество кешированных сообщений: <b>${cache_num}</b>`)
+    })
+
+    $.getJSON(info_file, function(info) {
+      log(`Канал с кешем: <b>${info.cache_channel}</b>`);
+      log(`Одна страница содержит до <b>${info.divide_by}</b> сообщений`)
+    });
+
+    ws_send({type: 'get_files_history_pages', data: {dr: CURRENT_DR}});
+
+    ws_send({type: 'already_have_history_accounts', data: {
+      dr: CURRENT_DR
+    }});
+  }
+
+  function update_history_messages_offset_cb() {
+    green_log('Сохранено');
+    $('#log').html('');
+    print_info();
+  }
+
+  function get_files_history_cb(data) {
+    $('#choose_history').html(`<option value='none'>Выберите файл истории</option>`);
+    for (let dr of data.dirs) {
+        $('#choose_history').append(`<option value='${dr}'>${dr}</option>`);
+    }
+    history_file_changed()
+  }
+
+  function history_file_changed() {
+    if (this.value == 'none' || typeof this.value == 'undefined') {
+      CURRENT_DR = null;
+      return
+    }
+
+    log('');
+    log(`Выбран файл <b>${this.value}</b>`);
+    
+    CURRENT_DR = this.value;
+
+    print_info();
+  }
+  
+  $('#choose_history').on('change', history_file_changed);
+      
+</script>
+
+  <div class="box span6">
+    <div class="box-header" data-original-title="">
+      <h2>Информация</h2>
+      <div class="box-icon">
+        <a href="#" class="btn-setting clean_history"><i class="halflings-icon white trash"></i></a>
+      </div>
+    </div>
+    <div class="box-content">
+      <div class="log-content h100vh h100p">  
+          <ul id="log">
+          </ul>
+      </div>
+    </div>   
+  </div>
+
+
+</div>
+
+<div class="account_chooser">
+  <div class="accounts_chooser_content">
+      <div class="box">
+      <div class="box-header">
+        <h2>Выберите аккаунты для работы (всего доступно <span class="how">0</span> аккаунтов)</h2>
+        <div class="box-icon">
+          <a href="#" class="btn-close-modal">
+            <i class="halflings-icon white remove"></i>
+          </a>
+        </div>
+      </div>
+      <div class="box-content">
+        <div class="account_range">
+          <div class="slider sliderRangeAccountsCheck red"></div> <span class="chose_all">выбрать все</span>
+          <div class="field_notice">(<span class="must sliderRangeLabel" style="color:  black;"></span>)</div>
+        </div>
+
+        <div class="inner">
+          <table class="table table-striped table-bordered">
+            <thead class='accounts_list_head_fast'>
+              <tr>
+                <th></th>
+                <th>Аватар</th>
+                <th>Юзернейм</th>
+                <th>Имя</th>
+                <th>Телефон</th>
+                <th>Отлёжка</th>
+              </tr>
+            </thead>   
+            <tbody id='accounts_list_fast'></tbody>
+          </table> 
+        </div>
+        <span class="label label-success lnp btn-fast-success">Принять</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  var account_fast_list = {}
+  function open_account_chooser() {
+    $('.account_chooser').css({display: 'flex'})
+
+    return new Promise((resolve, reject) => {
+      $('.account_chooser .btn-fast-success').off('click')
+      $('.account_chooser .btn-fast-success').click(function() {
+        let accs = getActiveAccounts()
+        console.log(accs)
+        close_account_chooser()
+        resolve(accs)
+      })
+      $('.account_chooser .btn-close-modal').off('click')
+      $('.account_chooser .btn-close-modal').click(function(e) {
+        e.preventDefault()
+        close_account_chooser()
+        resolve([])
+      })
+    })
+  }
+  function close_account_chooser() {
+    unsetActives()
+    $('.account_chooser').css({display: 'none'})
+  }
+  function getActiveAccounts() {
+    var result = []
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      var acc = $(sels[i])
+      if (acc.hasClass('active')) {
+        result.push(acc.attr('phone'))
+      }
+    }
+    return result;
+  }
+  $('.btn-close-modal').click(function(e) {
+    e.preventDefault()
+    close_account_chooser()
+  })
+  function unsetActives() {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      $(sels[i]).removeClass('active')
+    }
+    $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+    $('.sliderRangeAccountsCheck').removeClass('opacity03')
+  }
+
+  function selectByIndex(x, y) {
+    var sels = $('#accounts_list_fast tr')
+    for (var i = 0; i < sels.length; i++) {
+      if (i+1 >= x && i+1 <= y) {
+        $(sels[i]).addClass('active')
+      } else {
+        $(sels[i]).removeClass('active')
+      }
+    }
+  }
+
+  function set_data_for_fast_choose(data) {
+    var table = ''
+    account_fast_list = data
+
+    $('.account_chooser .box-header .how').html(account_fast_list.length)
+
+    for (var account in data.account_list) {
+        var ac_info = data.account_list[account]
+        var number = account
+
+        var avatar = './img/default.png'
+        if (ac_info.avatar != 'default') {
+          if (ac_info.avatar != null) {
+            avatar = ac_info.avatar
+            avatar = avatar.replace('static/', '')
+          }
+        }
+
+        var username = '<span class="cline">не установлен</span>'
+        if (ac_info.username != null) {
+          username = '@' + ac_info.username
+        }
+
+        var phone = ac_info.phone
+        var lives = ac_info.lives
+
+        var cl_lives = 'green'
+        if (lives.indexOf('недель') != -1) { cl_lives = 'lgreen' }
+        if (lives.indexOf('дней') != -1) { cl_lives = 'lblue' }
+        if (lives.indexOf('часов') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('минут') != -1) { cl_lives = 'lred' }
+        if (lives.indexOf('секунд') != -1) { cl_lives = 'lred' }
+
+        name = ac_info.first_name || ''
+        if (ac_info.last_name != null && ac_info.last_name.length > 0) {
+          name += ' ' + ac_info.last_name
+        }
+
+        table += `<tr phone="${phone}">`
+        table += `<td class="active_row"><i class="icon-ok"></i></td>`
+        table += `<td class="avatar center"><img src="${avatar}" onerror="this.src = './img/default.png'"/></td>`
+        table += `<td class='username'>${username}</td>`
+        table += `<td class='name'>${name}</td>`
+        table += `<td class="phone center">${phone}</td>`
+        table += `<td class="lives center"><span class="${cl_lives}">${lives}</span></td>`
+        table += `</tr>`
+      }
+
+
+      $('#accounts_list_fast').append(table)
+
+      $( ".sliderRangeAccountsCheck" ).slider({
+        range: true,
+        min: 1,
+        max: account_fast_list.length,
+        values: [1, account_fast_list.length],
+        slide: function( event, ui ) {
+          $( ".sliderRangeLabel" ).html( "от " + ui.values[ 0 ] + " до " + ui.values[ 1 ]);
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          selectByIndex(ui.values[0], ui.values[1])
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          }
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      });
+
+      $('.chose_all').click(function() {
+        if ($(this).hasClass('choseed_all') == false) {
+          var sels = $('#accounts_list_fast tr')
+          for (var i = 0; i < sels.length; i++) {
+            $(sels[i]).addClass('active')
+          }
+          var accs = getActiveAccounts()
+          if (accs.length > 0) {
+            $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+            $('.sliderRangeAccountsCheck').addClass('opacity03')
+          } else {
+            $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+            $('.sliderRangeAccountsCheck').removeClass('opacity03')
+          }
+
+          $(this).addClass('choseed_all')
+          $(this).html('снять выбор')
+        } else {
+          unsetActives()
+          $(this).removeClass('choseed_all')
+          $(this).html('выбрать все')
+        }
+      })
+
+      $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+
+      $('#accounts_list_fast tr').click(function() {
+        if ($(this).hasClass('active') == false) {
+          $(this).addClass('active')
+        } else {
+          $(this).removeClass('active')
+        }
+        var accs = getActiveAccounts()
+        if (accs.length > 0) {
+          $( ".sliderRangeLabel" ).html( "выбрано " + accs.length + ' аккаунтов');
+          $('.sliderRangeAccountsCheck').addClass('opacity03')
+        } else {
+          $( ".sliderRangeLabel" ).html( "аккаунты не выбраны");
+          $('.sliderRangeAccountsCheck').removeClass('opacity03')
+        }
+      })
+  }
+
+
+
+  loading_start();
+  var accounts_info = {};
+
+  $('[rel="tooltip"],[data-rel="tooltip"]').tooltip({"placement":"bottom", delay: { show: 400, hide: 200 }});
+
+
+
+
+  $(document).ready(function() {
+
+    WS = new ReconnectingWebSocket("ws://localhost:" + location.port + "/websocket");
+
+    WS.onopen = function() {
+        loading_stop()
+        ws_send({type: 'get_accounts'});
+        ws_send({type: 'full_account_info'});
+        ws_send({type: 'get_files_history'});
+    };
+
+    WS.onclose = function(event) {
+      loading_start()
+      red_log('Соединение с сервером потеряно');
+    };
+
+    
+
+    WS.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+      var f_data = data.data
+      ws_defs(evt);
+     
+      
+      if (data.type == 'get_files_history_pages_cb') get_files_history_pages_cb(f_data)
+      if (data.type == 'full_account_info') set_data_for_fast_choose(f_data);
+      if (data.type == 'group_info_result') group_info_result(f_data);
+      if (data.type == 'update_history_messages_offset_cb') update_history_messages_offset_cb();
+      if (data.type == 'get_files_history_cb') get_files_history_cb(f_data)
+      if (data.type == 'already_have_history_accounts_cb') already_have_history_accounts_cb(f_data);
+
+      if (data.type == 'normalize_history_users_end') normalize_history_users_end(f_data); 
+    };
+  })
+
+  window.onbeforeunload = function() {
+      WS.onclose = function () {};
+      WS.close();
+  };
+
+</script>

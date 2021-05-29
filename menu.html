@@ -1,0 +1,192 @@
+<style>
+	.not_for_demo {display: none;}
+</style>
+
+<div class="brand" href="#">
+	<span>Telegram Soft</span>
+	<span class="version">...</span>
+</div>
+
+
+<div class="notify">
+	<div class="unread_badge"></div>
+	<span class="material-icons">notifications</span>
+</div>
+
+<div class="lang">
+	<span></span>
+</div>
+
+<div class="open_all"><i class="icon-arrow-right"></i></div>
+
+<li><a class="disabled" href="#" page="main"><span class="material-icons">home</span><span> Главная</span></a></li> 
+
+<li><a class="disabled" href="#" page="accounts"><span class="material-icons">people_alt</span><span> Аккаунты</span></a></li> 
+
+<li><a class="disabled" href="#" page="register"><span class="material-icons">person_add</span><span> Регистрация</span></a></li> 
+
+<li><a class="disabled" href="#" page="chat_replier"><span class="material-icons">more</span><span> Диалоги <span class="green_badge">В разработке</span></span></a></li> 
+
+
+<li>
+	<a class="dropmenu" href="#"><span class="material-icons">local_post_office</span><span> Работа с сообщениями</span></a>
+	<ul style="display: none;">
+		<li><a class="disabled submenu" href="#" page="send_messages"><span> В ЛС</span></a></li> 
+		<li><a class="disabled submenu" href="#" page="group_spam"><span> В группы</span></a></li> 
+		<li><a class="disabled submenu" href="#" page="cycle"><span> Циклично</span></a></li>
+		<li><a class="disabled submenu" href="#" page="spin"><span> Спинтакс</span></a></li>
+	</ul>	
+</li>
+
+<li>
+	<a class="dropmenu" href="#"><span class="material-icons">pageview</span><span> Аудитория</span></a>
+	<ul style="display: none;">
+		<li><a class="submenu disabled" href="#" page="parser"><span> Парсер</span></a></li> 
+		<li><a class="submenu disabled" href="#" page="checker2"><span> Чеккер</span></a></li> 
+		<li><a class="submenu disabled" href="#" page="get_usernames"><span> Контакты из диалогов</span></a></li>
+	</ul>	
+</li>
+
+<li><a class="disabled" href="#" page="inviter"><span class="material-icons">family_restroom</span><span> Инвайтинг</span></a></li> 
+
+<li>
+	<a class="dropmenu" href="#"><span class="material-icons">trending_up</span><span> Накрутка</span></a>
+	<ul style="display: none;">
+		<li><a class="submenu disabled" href="#" page=""><span> Накрутка просмотров</span></a></li>
+		<li><a class="submenu disabled" href="#" page="subscribers"><span> Накрутка подписчиков</span></a></li>
+	</ul>	
+</li>
+
+<li><a class="disabled" href="#" page="report"><span class="material-icons">error</span><span> Репорты</span> <span class="red_badge">Модуль</span></a></li>
+
+
+<li>
+	<a class="dropmenu" href="#"><span class="material-icons">sd_storage</span><span> Клоннер</span> <span class="red_badge">Модуль</span></a>
+	<ul style="display: none;">
+		<li><a class="submenu" href="#" page='clonner'><span> Сборка</span></a></li>
+		<li><a class="submenu" href="#" page='editor'><span> Редактор</span></a></li>
+		<li><a class="submenu" href="#" page='poster'><span> Постер</span></a></li>
+	</ul>	
+</li>
+
+<li>
+	<a class="dropmenu" href="#"><span class="material-icons">build</span> <span> Настройки</span></a>
+	<ul style="display: none;">
+		<li><a class="disabled submenu" href="#" page="settings"><span> Основные</span></a></li>
+		<li><a class="disabled submenu" href="#" page="proxy2"><span> Управление прокси</span></a></li>
+		<li><a class="disabled submenu" href="#" page="tor_proxy"><span> Тор</span></a></li>
+	</ul>	
+</li>
+
+
+<li><a class="disabled" href="http://info.telegram-soft.org" page="new_page"><span class="material-icons">school</span><span> База знаний</span></a></li> 
+
+<li class="not_for_demo"><a class="disabled" href="https://accounts.telegram-soft.org" page="new_page"><span class="material-icons">store</span><span> Магазин аккаунтов</span></a></li> 
+
+<li class="not_for_demo"><a class="disabled" href="https://info.telegram-soft.org/partners" page="new_page"><span class="material-icons">attach_money</span><span> Партнёрам</span></a></li>
+
+<div class="lip">
+	<div class="inner-nav-child legend_area">
+	    <div class="legend">
+	      <span class="legend-label bg-g"></span>
+	      <span class="legend-num legend_accs_num">0</span>
+	      <div class="legend-desc">Аккаунтов</div>
+	    </div>
+
+	    <div class="spacer-10"></div>
+	    <div class="legend">
+	      <span class="legend-label bg-y"></span>
+	      <span class="legend-num legend_temp_accs_num">0</span>
+	      <div class="legend-desc">Архив</div>
+	    </div>
+
+	    <div class="spacer-10"></div>
+	    <div class="legend">
+	      <span class="legend-label bg-p"></span>
+	      <span class="legend-num legend_proxy_length">0</span>
+	      <div class="legend-desc">Прокси</div>
+	    </div>
+
+	    <div class="spacer-10 threaded_tor_block"></div>
+	    <div class="legend threaded_tor_block">
+	      <span class="legend-label bg-c animation_here"></span>
+	      <span class="legend-num threaded_tor_current">0</span>
+		  <span class="threaded_proxy_divider">/</span>
+		  <span class="threaded_tor_max">0</span>
+	      <div class="legend-desc">Tor-прокси</div>
+	    </div>
+  	</div>
+</div>
+
+<style>
+	.bouncing {
+		animation: bounce 1s infinite;
+		filter: hue-rotate(134deg);
+	}
+
+	@keyframes bounce {
+		0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+		40% {
+			transform: translateY(-10px) scale(1.2);
+		}
+		60% {
+			transform: translateY(-5px) scale(1.0);
+		}
+	}
+</style>
+<script>
+	var initTime = + new Date() / 1000;
+	$.each($('#main_menu a'), function() {
+		if ($(this).attr('page') == GetURLParameter('p')) {
+			$(this).parent().addClass('active');
+			if ($(this).hasClass('submenu')) {
+				$(this).parent().parent().slideToggle()
+			}
+			
+		}
+		if ($(this).attr('page') != '') {
+			$(this).removeClass('disabled');
+		}
+	});
+
+	$('#main_menu a').on('click', function(e) {
+		if ($(this).hasClass('dropmenu')) {
+			return
+		}
+		e.preventDefault();
+
+  		var new_page = $(this).attr('page')
+  		
+  		if (new_page == 'new_page') {
+  			window.open($(this).attr('href'), '_blank');
+  			return; 
+  		}
+
+  		if (+ new Date() / 1000 > initTime + 8) {
+	  		$.ajax({
+			   url: `http://localhost:${location.port}/ping`,
+			   success: function(){
+			        location.href = '?p=' + new_page; 
+			   },
+			   error: function(){
+			        new duDialog('Невозможно выполнить действие', 'Программа в данный момент занята каким-то процессом');
+			    },
+			   timeout: 1500
+			});	
+  		} else {
+  			location.href = '?p=' + new_page; 
+  		}
+	});
+
+	$('.dropmenu').click(function(e){
+		e.preventDefault();
+		$(this).parent().find('ul').slideToggle();
+	});
+
+	$('.open_all').click(function() {
+		for (let child of $('.dropmenu')) {
+			$(child).parent().find('ul').slideToggle();
+		}
+	});
+
+</script>

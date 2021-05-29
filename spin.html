@@ -1,0 +1,311 @@
+
+<link rel="stylesheet" type="text/css" href="css/semantic.min.css">
+
+  <style>
+    .w100 {
+      width: 100%;
+    } 
+    .tac {
+      text-align: center;
+    }
+    .column {
+      margin-top: 16px;
+    }
+    label {
+      font-weight: 700;
+    }
+    .dis {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+    .container {
+      margin: 10px 0;
+    }
+    span.greend {
+      color: green;
+    }
+    @keyframes letter {
+		from {text-shadow: 0 0 3px red;}
+		50% {text-shadow: 0 0 10px red;}
+		to {text-shadow: 0 0 3px red;}
+	}
+    a {
+      text-decoration: none;
+      color: #cb3837;
+    }
+
+    .var_text {
+      font-size: 18px;
+      margin: 10px 0;
+      background: #fff;
+      border: 1px solid rgba(34,36,38,.15);
+      outline: 0;
+      color: rgba(0,0,0,.87);
+      border-radius: .28571429rem;
+      -webkit-box-shadow: 0 0 0 0 transparent inset;
+      box-shadow: 0 0 0 0 transparent inset;
+      -webkit-transition: color .1s ease,border-color .1s ease;
+      transition: color .1s ease,border-color .1s ease;
+      padding: .78571429em 1em;
+      letter-spacing: 2px;
+  }
+  .index_in_txt, .variants {
+    height: 36px !important;
+  }
+  input {
+      height: 36px !important;
+  }
+  .ui.button {
+    height: 36px  !important;
+  }
+  </style>
+<div class="row-fluid">
+  <div id="app" class=" ui container" style="display: none;">
+    <div class="column">
+      <label>Маска</label>
+      <div class="ui action input w100 mask_cont">
+        <input type="text" class="mask" placeholder="Маска">
+        <button class="ui primary button check_mask">Проверить</button>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="ui action input w100">
+        <a class="ui red tag label mask_bad">Маска неверная</a>
+        <a class="ui teal tag label mask_valid">Маска корректная</a>
+      </div>
+    </div>
+
+
+    <div class="column txt">
+      <div class="ui form">
+        <label>Текст</label>
+        <textarea rows="5" class="user_text"></textarea>
+        <button class="ui brown basic button create">Создать spintax</button>
+      </div>
+    </div>
+
+
+    <div class="column res">
+      <div class="ui form">
+        <div class="field">
+          <label>Результат</label>
+          <textarea rows="5" class="res_text"></textarea>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="column var">
+      <div class="ui form">
+        <div class="field">
+          <label>Один из вариантов</label>
+          <div class="var_text"></div>
+          <button class="ui mini purple basic button gen">Сгенерировать ещё</button>
+        </div>
+      </div>
+    </div>
+    </div>
+</div>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="js/semantic.min.js"></script>
+  <script>
+    const defaultMask = `{а|a}, {А|A}, {В|B}, {е|e}, {Е|E}, {К|K}, {М|M}, {Н|H}, {о|o}, {О|O}, {р|p}, {Р|P}, {с|c}, {С|C}, {Т|T}, {х|x}, {Х|X}, {у|y}`
+
+var mask = ''
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+const indexesF = (source, find) => {
+  if (!source) {
+    return [];
+  }
+  if (!find) {
+      return source.split('').map(function(_, i) { return i; });
+  }
+  var result = [];
+  var i = 0;
+  while(i < source.length) {
+    if (source.substring(i, i + find.length) == find) {
+      result.push(i);
+      i += find.length;
+    } else {
+      i++;
+    }
+  }
+  return result;
+}
+
+const checkMask = mask => {
+  let idx = 0
+  let valid = true
+  try {
+    let indexes = mask.split(',')
+    for (let index of indexes) {
+      index = index.trim()
+      if (index[0] != '{' || index[index.length-1] != '}') {
+        throw new SyntaxError("Данные некорректны");
+      }
+      let lst = index
+        .replaceAll('\'', '')
+        .replaceAll('\"', '')
+        .replaceAll('{', '')
+        .replaceAll('}', '')
+        .split('|')
+
+      if (lst.length < 2) {
+        throw new SyntaxError("Данные некорректны");
+      }
+
+      idx += 1
+    }
+  } catch (err) {
+    valid = false
+  }
+
+  if (valid && idx > 0) {
+    $('.mask_valid').show()
+    $('.mask_bad').hide()
+    $('.txt').removeClass('dis')
+    $('.res').addClass('dis')
+    $('.var').addClass('dis')
+  } else {
+    $('.mask_bad').show()
+    $('.mask_valid').hide()
+    $('.txt').addClass('dis')
+    $('.res').addClass('dis')
+    $('.var').addClass('dis')
+  }
+}
+
+$(document).ready(() => {
+  $("#app").show()
+  $('.mask').val(defaultMask)
+  $('.txt').addClass('dis')
+  $('.res').addClass('dis')
+  $('.var').addClass('dis')
+  $('.mask_bad').hide('')
+  $('.mask_valid').hide('')
+
+})
+
+const transformSpintax = (text, mask) => {
+  let indexes = mask.split(',')
+  let txtIdx = []
+  for (let index of indexes) {
+    let lst = index
+        .trim()
+        .replaceAll('\'', '')
+        .replaceAll('\"', '')
+        .replaceAll('{', '')
+        .replaceAll('}', '')
+        .split('|')
+
+    let key = lst[0]
+    let foundKeys = indexesF(text, key).length
+    index = index.trim()
+    text = text.replaceAll(key, index)
+    
+    if (foundKeys > 0) {
+      txtIdx.push([foundKeys, lst.length])
+    }
+  }
+
+  let rndText = Spin(text)
+
+  $('.res_text').html(text)
+  $('.var_text').html(rndText)
+
+  $('.res').removeClass('dis')
+  $('.var').removeClass('dis')  
+} 
+
+$('.check_mask').click(function() {
+  mask = $(this).parent().find('.mask').val()
+  checkMask(mask)
+})
+
+$('.create').click(function() {
+  let txt = $('.user_text').val()
+  if (txt.length == 0) {
+    return
+  }
+
+  transformSpintax(txt, mask)
+})
+
+$('.gen').click(function() {
+  let text = $('.res_text').val()
+  $('.var_text').html(Spin(text))
+})
+
+function computeVariants(text) {
+  var keys = 0
+  var variants = 1
+  var openQ = false
+  var kArr = []
+  var allK = 0
+  for (let idx in text) {
+    if (text[idx] == '{') {
+      openQ = true
+      keys += 1
+    }
+    if (text[idx] == '|' && openQ) {
+      keys += 1
+    }
+    if (text[idx] == '}' && openQ) {
+      openQ = false
+      variants *= keys
+      allK += keys
+      keys = 0
+    }
+  }
+  $('.index_in_txt').html(allK)
+  $('.variants').html(variants)
+}
+var textareaval = "";
+var oldVal = "";
+
+$(".res_text").on("change keyup paste", function() {
+  var currentVal = $(this).val()
+
+    if(currentVal == oldVal) return
+
+    oldVal = currentVal;
+  textareaval = currentVal
+  $('.res_text').val(textareaval)
+
+  $('.var_text').html(Spin(textareaval))
+   computeVariants(textareaval)
+});
+
+
+function Spin(s) {
+ var m = s.match(/\{(.*?)\}/i);
+ if ( !m ) return s;
+ var t = m[1];
+ 
+ if ( t.indexOf("{") !== false ) 
+  t = t.substr(t.lastIndexOf("{") + 1)
+ 
+ var parts = t.split("|");
+ var regex = new RegExp("\{" + preg_quote(t) + "\}");
+ var idx = Math.floor(Math.random() * parts.length)
+ var pre = ""
+ var aft = ""
+ if (idx > 0) {
+  pre = '<span class="greend">'
+  aft = '</span>'
+ } 
+ s = s.replace( regex, pre + parts[idx] + aft);
+ 
+ return Spin(s);
+}
+ 
+function preg_quote(str, delimiter) {
+ return String(str).replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+}
+  </script>
